@@ -1,0 +1,169 @@
+import 'package:flutter/material.dart';
+
+class SlidePuzzleScreen extends StatefulWidget {
+  const SlidePuzzleScreen({super.key});
+
+  @override
+  State<SlidePuzzleScreen> createState() => _SlidePuzzleScreenState();
+}
+
+class _SlidePuzzleScreenState extends State<SlidePuzzleScreen> {
+  int gridSize = 3;
+  List<int> tiles = [];
+  int score = 0;
+  final List<int> gridOptions = [3, 4, 5];
+
+  @override
+  void initState() {
+    super.initState();
+    _initializePuzzle();
+  }
+
+  void _initializePuzzle() {
+    tiles = List.generate(gridSize * gridSize, (index) => index);
+    do {
+      tiles.shuffle();
+    } while (!_isSolvable(tiles));
+    score = 0;
+    setState(() {});
+  }
+
+  bool _isSolvable(List<int> list) {
+    int invCount = 0;
+    for (int i = 0; i < list.length - 1; i++) {
+      for (int j = i + 1; j < list.length; j++) {
+        if (list[i] != 0 && list[j] != 0 && list[i] > list[j]) {
+          invCount++;
+        }
+      }
+    }
+    return invCount % 2 == 0;
+  }
+
+  void _moveTile(int index) {
+    int emptyIndex = tiles.indexOf(0);
+    List<int> possibleMoves = [
+      emptyIndex - 1,
+      emptyIndex + 1,
+      emptyIndex - gridSize,
+      emptyIndex + gridSize
+    ];
+
+    if (possibleMoves.contains(index) && _isValidMove(index, emptyIndex)) {
+      setState(() {
+        tiles[emptyIndex] = tiles[index];
+        tiles[index] = 0;
+        score++;
+      });
+    }
+  }
+
+  bool _isValidMove(int from, int to) {
+    int fx = from % gridSize;
+    int fy = from ~/ gridSize;
+    int tx = to % gridSize;
+    int ty = to ~/ gridSize;
+    return (fx == tx && (fy - ty).abs() == 1) || (fy == ty && (fx - tx).abs() == 1);
+  }
+
+  void _handleSwipe(int index, DragEndDetails details) {
+    Offset velocity = details.velocity.pixelsPerSecond;
+    int dx = velocity.dx.abs() > velocity.dy.abs()
+        ? (velocity.dx > 0 ? 1 : -1)
+        : 0;
+    int dy = velocity.dy.abs() > velocity.dx.abs()
+        ? (velocity.dy > 0 ? 1 : -1)
+        : 0;
+
+    int targetX = index % gridSize + dx;
+    int targetY = index ~/ gridSize + dy;
+    int targetIndex = targetY * gridSize + targetX;
+
+    if (targetX >= 0 && targetX < gridSize && targetY >= 0 && targetY < gridSize) {
+      if (tiles[targetIndex] == 0) {
+        _moveTile(index);
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // double tileSize = MediaQuery.of(context).size.width / gridSize - 12;
+
+    return Scaffold(
+      backgroundColor: const Color.fromARGB(255, 55, 140, 211),
+      appBar: AppBar(
+        backgroundColor: Color.fromARGB(255, 55, 140, 211),
+        title: const Text('Puzzle de Números', style: TextStyle(color: Colors.black)),
+        actions: [
+          DropdownButton<int>(
+            value: gridSize,
+            dropdownColor: Colors.white,
+            items: gridOptions.map((size) {
+              return DropdownMenuItem(
+                value: size,
+                child: Text('${size}x$size', style: TextStyle(color: Colors.black)),
+              );
+            }).toList(),
+            onChanged: (value) {
+              if (value != null) {
+                setState(() {
+                  gridSize = value;
+                  _initializePuzzle();
+                });
+              }
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            tooltip: 'Reiniciar nivel',
+            onPressed: _initializePuzzle,
+            color: Colors.black,
+          ),
+        ],
+      ),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Text('Movimientos: $score', style: const TextStyle(fontSize: 24, color: Colors.black)),
+          ),
+          Expanded(
+            child: GridView.builder(
+              padding: const EdgeInsets.all(16),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: gridSize,
+                mainAxisSpacing: 8,
+                crossAxisSpacing: 8,
+              ),
+              itemCount: tiles.length,
+              itemBuilder: (context, index) {
+                return GestureDetector(
+                  onTap: () => _moveTile(index),
+                  onHorizontalDragEnd: (details) => _handleSwipe(index, details),
+                  onVerticalDragEnd: (details) => _handleSwipe(index, details),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    decoration: BoxDecoration(
+                      color: tiles[index] == 0 ? Colors.transparent : const Color.fromRGBO(241, 193, 100, 1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Center(
+                      child: Text(
+                        tiles[index] == 0 ? '' : '${tiles[index]}',
+                        style: const TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

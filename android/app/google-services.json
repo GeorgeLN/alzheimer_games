@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1038042420278",
+    "project_id": "alzheimer-games-app",
+    "storage_bucket": "alzheimer-games-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1038042420278:android:35052ba4cb8574d0057497",
+        "android_client_info": {
+          "package_name": "com.youthink.alzheimergamesapp.alzheimer_games_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDYn0QYHhlz5oQ3oQQ7bSr5zz0HHqq1mB0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
