@@ -30,4 +30,11 @@ Future<void> setupInjection() async {
   //     firestoreService: inject<FirestoreService>(),
   //   );
   // });
+
+  inject.registerLazySingleton<UserRepository>(() {
+    return UserRepository(
+      authService: inject<AuthService>(),
+      firestoreService: inject<FirestoreService>(),
+    );
+  });
 }
