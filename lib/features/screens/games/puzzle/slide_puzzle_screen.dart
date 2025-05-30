@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:collection/collection.dart'; // For ListEquality
+import 'package:get_it/get_it.dart'; // Import GetIt
+import './puzzle_view_model.dart'; // Import ViewModel
 
 class SlidePuzzleScreen extends StatefulWidget {
   const SlidePuzzleScreen({super.key});
@@ -12,10 +15,15 @@ class _SlidePuzzleScreenState extends State<SlidePuzzleScreen> {
   List<int> tiles = [];
   int score = 0;
   final List<int> gridOptions = [3, 4, 5];
+  int finalScore = 0;
+  bool isCompleted = false;
+
+  PuzzleViewModel? _viewModel; // ViewModel instance
 
   @override
   void initState() {
     super.initState();
+    _viewModel = GetIt.I<PuzzleViewModel>(); // Initialize ViewModel
     _initializePuzzle();
   }
 
@@ -25,7 +33,23 @@ class _SlidePuzzleScreenState extends State<SlidePuzzleScreen> {
       tiles.shuffle();
     } while (!_isSolvable(tiles));
     score = 0;
+    isCompleted = false;
+    finalScore = 0;
     setState(() {});
+  }
+
+  void _checkIfSolved() {
+    List<int> solvedTiles = List.generate(gridSize * gridSize, (i) => (i + 1) % (gridSize * gridSize));
+    // Example for 3x3: solvedTiles will be [1, 2, 3, 4, 5, 6, 7, 8, 0]
+
+    if (const ListEquality().equals(tiles, solvedTiles)) {
+      setState(() {
+        isCompleted = true;
+        finalScore = 100;
+      });
+      _viewModel?.saveGameScore(finalScore); // Save score after solving
+      // Optionally, disable further moves or show a dialog
+    }
   }
 
   bool _isSolvable(List<int> list) {
@@ -55,6 +79,7 @@ class _SlidePuzzleScreenState extends State<SlidePuzzleScreen> {
         tiles[index] = 0;
         score++;
       });
+      _checkIfSolved();
     }
   }
 
@@ -126,7 +151,10 @@ class _SlidePuzzleScreenState extends State<SlidePuzzleScreen> {
         children: [
           Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Text('Movimientos: $score', style: const TextStyle(fontSize: 24, color: Colors.black)),
+            child: Text(
+              isCompleted ? '¡Resuelto! Puntaje: $finalScore (Movimientos: $score)' : 'Movimientos: $score',
+              style: const TextStyle(fontSize: 24, color: Colors.black),
+            ),
           ),
           Expanded(
             child: GridView.builder(
@@ -139,9 +167,9 @@ class _SlidePuzzleScreenState extends State<SlidePuzzleScreen> {
               itemCount: tiles.length,
               itemBuilder: (context, index) {
                 return GestureDetector(
-                  onTap: () => _moveTile(index),
-                  onHorizontalDragEnd: (details) => _handleSwipe(index, details),
-                  onVerticalDragEnd: (details) => _handleSwipe(index, details),
+                  onTap: isCompleted ? null : () => _moveTile(index),
+                  onHorizontalDragEnd: isCompleted ? null : (details) => _handleSwipe(index, details),
+                  onVerticalDragEnd: isCompleted ? null : (details) => _handleSwipe(index, details),
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
                     decoration: BoxDecoration(

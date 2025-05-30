@@ -1,6 +1,8 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart'; // Import GetIt
+import './pattern_view_model.dart'; // Import ViewModel
 
 class FiguraEncajeScreen extends StatefulWidget {
   const FiguraEncajeScreen({super.key});
@@ -42,10 +44,12 @@ class _FiguraEncajeScreenState extends State<FiguraEncajeScreen> {
   String nivel = 'Fácil';
 
   final List<String> niveles = ['Fácil', 'Medio', 'Difícil'];
+  PatternViewModel? _viewModel; // ViewModel instance
 
   @override
   void initState() {
     super.initState();
+    _viewModel = GetIt.I<PatternViewModel>(); // Initialize ViewModel
     _cambiarNivel(nivel);
   }
 
@@ -58,8 +62,9 @@ class _FiguraEncajeScreenState extends State<FiguraEncajeScreen> {
   void _verificarEncaje(String figura) {
     if (figura == figuraObjetivo) {
       setState(() {
-        score++;
+        score += 10;
       });
+      _viewModel?.saveGameScore(score); // Save score after updating
     } else {
       setState(() {
         score = score > 0 ? score - 1 : 0;

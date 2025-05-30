@@ -1,4 +1,6 @@
 import 'package:flutter/foundation.dart';
+import 'package:alzheimer_games_app/data/models/user_model/user_model.dart'; // Added
+import 'package:alzheimer_games_app/data/repositories/user_repository.dart'; // Added
 
 enum PuzzleStatus {
   loading,
@@ -8,7 +10,10 @@ enum PuzzleStatus {
 }
 
 class PuzzleViewModel with ChangeNotifier {
+  final UserRepository userRepository; // Added
   var status = PuzzleStatus.loading;
+
+  PuzzleViewModel({required this.userRepository}); // Added constructor
 
   Future<void> initialize() async {
     try {
@@ -17,6 +22,21 @@ class PuzzleViewModel with ChangeNotifier {
       emitContent();
     } catch (_) {
       emitError();
+    }
+  }
+
+  Future<void> saveGameScore(int newScore) async { // Added method
+    try {
+      PlayerModel currentPlayer = await userRepository.getCurrentPlayer();
+      await userRepository.updateUser(
+        scorePuzzle: newScore,
+        scoreMemory: currentPlayer.scoreMemory,
+        scorePattern: currentPlayer.scorePattern,
+        scoreTrivia: currentPlayer.scoreTrivia,
+      );
+      print('Puntaje de Puzzle guardado: $newScore');
+    } catch (e) {
+      print('Error al guardar puntaje de Puzzle: $e');
     }
   }
   

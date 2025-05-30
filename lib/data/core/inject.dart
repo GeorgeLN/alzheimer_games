@@ -4,6 +4,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
 
+// ViewModel imports
+import '../../features/screens/games/memorama/memorama_view_model.dart';
+import '../../features/screens/games/pattern/pattern_view_model.dart';
+import '../../features/screens/games/puzzle/puzzle_view_model.dart';
+import '../../features/screens/games/trivia/trivia_view_model.dart'; // Added
+
+// Repository imports already present
+import '../repositories/user_repository.dart'; // Ensure this is imported if not already for clarity
+
 import '../services/authentication/auth_service.dart';
 import '../services/firestore/firestore_service.dart';
 
@@ -37,4 +46,15 @@ Future<void> setupInjection() async {
       firestoreService: inject<FirestoreService>(),
     );
   });
+
+  // Register ViewModels
+  inject.registerFactory(() => MemoramaViewModel(userRepository: inject<UserRepository>()));
+  inject.registerFactory(() => PatternViewModel(userRepository: inject<UserRepository>()));
+  inject.registerFactory(() => PuzzleViewModel(userRepository: inject<UserRepository>()));
+  inject.registerFactory(() => TriviaViewModel( // Added
+        questionRepository: inject<QuestionRepository>(),
+        firestoreService: inject<FirestoreService>(),
+        authService: inject<AuthService>(),
+        userRepository: inject<UserRepository>(),
+      ));
 }
