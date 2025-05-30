@@ -33,7 +33,7 @@ class _TriviaScreenState extends State<TriviaScreen> {
       selectedAnswer = index;
       answered = true;
       if (index == viewModel!.questionModel!.correctIndex) {
-        score += 1;
+        score += 10;
       }
     });
     Future.delayed(const Duration(seconds: 2), () {
@@ -48,11 +48,14 @@ class _TriviaScreenState extends State<TriviaScreen> {
   }
 
   void _showFinalDialog() {
+    // Guardar el puntaje de la sesión actual
+    viewModel?.saveGameScore(score);
+
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
         title: const Text('¡Juego Terminado!'),
-        content: Text('Puntaje final: $score / ${viewModel!.questionIds.length}'),
+        content: Text('Puntaje final: $score'),
         actions: [
           TextButton(
             onPressed: () {
@@ -131,7 +134,7 @@ class _TriviaScreenState extends State<TriviaScreen> {
               );
             }),
             const SizedBox(height: 30),
-            Text('Puntaje: ${viewModel!.playerModel?.scoreTrivia ?? 0}',
+            Text('Puntaje de la partida: $score',
             style: const TextStyle(fontSize: 22))
           ],
         ),

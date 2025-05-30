@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
+import 'package:get_it/get_it.dart'; // Import GetIt
 
 import '../../../../data/models/game_model/memorama_card_model.dart';
+import './memorama_view_model.dart'; // Import ViewModel
 
 class MemoramaScreen extends StatefulWidget {
   const MemoramaScreen({super.key});
@@ -18,9 +20,12 @@ class _MemoramaScreenState extends State<MemoramaScreen> with TickerProviderStat
   int score = 0;
   final List<int> gridOptions = [2, 4, 6];
 
+  MemoramaViewModel? _viewModel; // ViewModel instance
+
   @override
   void initState() {
     super.initState();
+    _viewModel = GetIt.I<MemoramaViewModel>(); // Initialize ViewModel
     _generateCards();
   }
 
@@ -55,6 +60,13 @@ class _MemoramaScreenState extends State<MemoramaScreen> with TickerProviderStat
           cards[i2].isMatched = true;
           score += 10;
         });
+
+        bool allMatched = cards.every((card) => card.isMatched);
+        if (allMatched) {
+          print('Memorama completado! Puntaje final: $score');
+          _viewModel?.saveGameScore(score);
+          _showGameCompletedDialog(score);
+        }
       } else {
         setState(() {
           cards[i1].isFlipped = false;
@@ -66,6 +78,26 @@ class _MemoramaScreenState extends State<MemoramaScreen> with TickerProviderStat
       selectedIndices.clear();
       canTap = true;
     }
+  }
+
+  void _showGameCompletedDialog(int finalScore) {
+    showDialog(
+      context: context,
+      barrierDismissible: false, // User must tap button to close
+      builder: (_) => AlertDialog(
+        title: const Text('¡Memorama Completado!'),
+        content: Text('Puntaje obtenido: $finalScore'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              _generateCards(); // Reinicia el juego
+            },
+            child: const Text('Jugar de Nuevo'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override

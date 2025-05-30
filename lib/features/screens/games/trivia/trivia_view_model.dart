@@ -1,6 +1,7 @@
 
 import 'package:alzheimer_games_app/data/models/models.dart';
 import 'package:alzheimer_games_app/data/repositories/question_repository.dart';
+import 'package:alzheimer_games_app/data/repositories/user_repository.dart'; // Added UserRepository import
 import 'package:alzheimer_games_app/data/services/authentication/auth_service.dart';
 import 'package:alzheimer_games_app/data/services/firestore/firestore_service.dart';
 // import 'package:cloud_firestore/cloud_firestore.dart';
@@ -17,6 +18,7 @@ enum TriviaStatus {
 class TriviaViewModel with ChangeNotifier {
   var status = TriviaStatus.loading;
   final QuestionRepository questionRepository;
+  final UserRepository userRepository; // Added UserRepository field
   QuestionModel? questionModel;
   PlayerModel? playerModel;
   final List<String> questionIds = [];
@@ -27,10 +29,26 @@ class TriviaViewModel with ChangeNotifier {
     required this.questionRepository,
     required this.firestoreService,
     required this.authService,
+    required this.userRepository, // Added to constructor
   });
   
   final FirestoreService firestoreService;
   final AuthService authService;
+
+  Future<void> saveGameScore(int newScore) async { // Added saveGameScore method
+    try {
+      PlayerModel currentPlayer = await userRepository.getCurrentPlayer();
+      await userRepository.updateUser(
+        scoreTrivia: newScore,
+        scoreMemory: currentPlayer.scoreMemory,
+        scorePattern: currentPlayer.scorePattern,
+        scorePuzzle: currentPlayer.scorePuzzle,
+      );
+      print('Puntaje de Trivia guardado: $newScore');
+    } catch (e) {
+      print('Error al guardar puntaje de Trivia: $e');
+    }
+  }
 
   void initialize() async {
     try {
