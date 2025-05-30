@@ -1,5 +1,3 @@
-import 'package:alzheimer_games_app/features/screens/auth/login_screen.dart';
-import 'package:alzheimer_games_app/features/screens/landing/landing_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:alzheimer_games_app/features/bloc/auth_cubit.dart';

@@ -20,8 +20,8 @@ class FirestoreService {
       String? name,
       String? email,
     }) async {
-    await _userRef.doc(userId).set(
-      PlayerModel.initial(),
+    await _userRef.doc(userId!).set(
+      PlayerModel.initial(userId: userId!, userName: name!),
     );
   }
 

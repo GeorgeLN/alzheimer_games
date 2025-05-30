@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../bloc/auth_cubit.dart';
 
 // import '../../../data/models/user_model/user_model.dart';
 
@@ -44,6 +47,28 @@ class ProfileScreen extends StatelessWidget {
                   prefixIcon: Icon(Icons.email),
                 ),
                 readOnly: true,
+              ),
+              const SizedBox(height: 32), // Espacio antes del botón
+              ElevatedButton.icon(
+                icon: const Icon(Icons.logout),
+                label: const Text('Cerrar sesión'),
+                onPressed: () {
+                  // Llamar al método signOut del AuthCubit
+                  context.read<AuthCubit>().signOut();
+                  // AuthWrapperScreen se encargará de la redirección a /login
+                  // Opcionalmente, para dar feedback inmediato antes de que AuthWrapper reaccione:
+                  // if (Navigator.of(context).canPop()) {
+                  //   Navigator.of(context).popUntil((route) => route.isFirst);
+                  // }
+                  // Navigator.of(context).pushReplacementNamed('/login'); 
+                  // Sin embargo, es mejor dejar que AuthWrapper lo maneje para consistencia.
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orange, // Un color distintivo para logout
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  textStyle: const TextStyle(fontSize: 16),
+                ),
               ),
             ],
           ),
