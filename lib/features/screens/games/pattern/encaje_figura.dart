@@ -49,8 +49,16 @@ class _FiguraEncajeScreenState extends State<FiguraEncajeScreen> {
   @override
   void initState() {
     super.initState();
+    _initializeGameScreen();
+  }
+
+  Future<void> _initializeGameScreen() async {
     _viewModel = GetIt.I<PatternViewModel>(); // Initialize ViewModel
-    _cambiarNivel(nivel);
+    int initialScore = await _viewModel!.loadInitialScore();
+    // Asegurarse de que el widget sigue montado después de la operación asíncrona
+    if (mounted) {
+      _cambiarNivel(nivel, initialScore: initialScore);
+    }
   }
 
   void _nuevaFiguraObjetivo() {
@@ -73,7 +81,7 @@ class _FiguraEncajeScreenState extends State<FiguraEncajeScreen> {
     Future.delayed(const Duration(seconds: 1), _nuevaFiguraObjetivo);
   }
 
-  void _cambiarNivel(String nuevoNivel) {
+  void _cambiarNivel(String nuevoNivel, {int initialScore = 0}) {
     setState(() {
       nivel = nuevoNivel;
       if (nivel == 'Fácil') {
@@ -83,7 +91,7 @@ class _FiguraEncajeScreenState extends State<FiguraEncajeScreen> {
       } else {
         figuras = figurasDificil;
       }
-      score = 0;
+      score = initialScore; // Usar initialScore aquí
       _nuevaFiguraObjetivo();
     });
   }
@@ -114,10 +122,9 @@ class _FiguraEncajeScreenState extends State<FiguraEncajeScreen> {
             icon: const Icon(Icons.refresh),
             tooltip: 'Reiniciar juego',
             onPressed: () {
-              setState(() {
-                score = 0;
-                _nuevaFiguraObjetivo();
-              });
+              // Al reiniciar, el score se establece a 0, y se llama a _cambiarNivel
+              // para regenerar las figuras del nivel actual con score 0.
+              _cambiarNivel(nivel, initialScore: 0);
             },
           )
         ],

@@ -17,14 +17,25 @@ class _SlidePuzzleScreenState extends State<SlidePuzzleScreen> {
   final List<int> gridOptions = [3, 4, 5];
   int finalScore = 0;
   bool isCompleted = false;
+  int highestOrLastPuzzleScore = 0; // Added state variable
 
   PuzzleViewModel? _viewModel; // ViewModel instance
 
   @override
   void initState() {
     super.initState();
+    _initializeGameScreen();
+  }
+
+  Future<void> _initializeGameScreen() async {
     _viewModel = GetIt.I<PuzzleViewModel>(); // Initialize ViewModel
-    _initializePuzzle();
+    if (_viewModel != null) {
+      highestOrLastPuzzleScore = await _viewModel!.loadInitialScore();
+    }
+    // Ensure the widget is still mounted before calling setState or other methods
+    if (mounted) {
+      _initializePuzzle();
+    }
   }
 
   void _initializePuzzle() {
@@ -45,9 +56,15 @@ class _SlidePuzzleScreenState extends State<SlidePuzzleScreen> {
     if (const ListEquality().equals(tiles, solvedTiles)) {
       setState(() {
         isCompleted = true;
-        finalScore = 100;
+        finalScore = 100; // Or any other logic to determine the score
+        // Save score and update local highest score
+        _viewModel?.saveGameScore(finalScore);
+        if (finalScore > highestOrLastPuzzleScore) { // Update if current finalScore is better (though it's fixed here)
+          highestOrLastPuzzleScore = finalScore;
+        }
+        // For simplicity, as per instructions, we can just update it
+        // highestOrLastPuzzleScore = finalScore; 
       });
-      _viewModel?.saveGameScore(finalScore); // Save score after solving
       // Optionally, disable further moves or show a dialog
     }
   }
@@ -152,8 +169,11 @@ class _SlidePuzzleScreenState extends State<SlidePuzzleScreen> {
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Text(
-              isCompleted ? '¡Resuelto! Puntaje: $finalScore (Movimientos: $score)' : 'Movimientos: $score',
+              isCompleted 
+                  ? '¡Resuelto! Puntaje: $finalScore (Movimientos: $score)\nMejor Puntaje: $highestOrLastPuzzleScore' 
+                  : 'Movimientos: $score\nMejor Puntaje: $highestOrLastPuzzleScore',
               style: const TextStyle(fontSize: 24, color: Colors.black),
+              textAlign: TextAlign.center,
             ),
           ),
           Expanded(

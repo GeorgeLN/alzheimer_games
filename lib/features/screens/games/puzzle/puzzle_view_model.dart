@@ -15,6 +15,16 @@ class PuzzleViewModel with ChangeNotifier {
 
   PuzzleViewModel({required this.userRepository}); // Added constructor
 
+  Future<int> loadInitialScore() async {
+    try {
+      PlayerModel player = await userRepository.getCurrentPlayer();
+      return player.scorePuzzle ?? 0;
+    } catch (e) {
+      print('Error al cargar puntaje inicial de Puzzle: $e');
+      return 0;
+    }
+  }
+
   Future<void> initialize() async {
     try {
       emitLoading();
