@@ -20,10 +20,27 @@ class _TriviaScreenState extends State<TriviaScreen> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       viewModel?.initialize();
+      // Listen to changes in viewModel to update highestTriviaScore
+      viewModel?.addListener(_updateHighestScoreFromViewModel);
     });
   }
 
+  void _updateHighestScoreFromViewModel() {
+    if (mounted && viewModel?.playerModel?.scoreTrivia != null) {
+      setState(() {
+        highestTriviaScore = viewModel!.playerModel!.scoreTrivia ?? 0;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    viewModel?.removeListener(_updateHighestScoreFromViewModel);
+    super.dispose();
+  }
+
   int score = 0;
+  int highestTriviaScore = 0; // Added state variable
   bool answered = false;
   int? selectedAnswer;
 
@@ -48,8 +65,17 @@ class _TriviaScreenState extends State<TriviaScreen> {
   }
 
   void _showFinalDialog() {
-    // Guardar el puntaje de la sesión actual
+    // Guardar el puntaje de la sesión actual (la lógica de si es mayor está en el VM)
     viewModel?.saveGameScore(score);
+
+    // Actualizar el highestTriviaScore local si el score actual es mayor
+    if (score > highestTriviaScore) {
+      if (mounted) {
+        setState(() {
+          highestTriviaScore = score;
+        });
+      }
+    }
 
     showDialog(
       context: context,
@@ -135,7 +161,10 @@ class _TriviaScreenState extends State<TriviaScreen> {
             }),
             const SizedBox(height: 30),
             Text('Puntaje de la partida: $score',
-            style: const TextStyle(fontSize: 22))
+                style: const TextStyle(fontSize: 22)),
+            const SizedBox(height: 10),
+            Text('Mejor Puntaje Trivia: $highestTriviaScore',
+                style: const TextStyle(fontSize: 20, color: Colors.black54)),
           ],
         ),
       ),

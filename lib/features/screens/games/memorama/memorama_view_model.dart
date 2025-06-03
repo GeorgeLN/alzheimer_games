@@ -7,6 +7,16 @@ class MemoramaViewModel with ChangeNotifier {
 
   MemoramaViewModel({required this.userRepository});
 
+  Future<int> loadInitialScore() async {
+    try {
+      PlayerModel player = await userRepository.getCurrentPlayer();
+      return player.scoreMemory ?? 0;
+    } catch (e) {
+      print('Error al cargar puntaje inicial de Memorama: $e');
+      return 0;
+    }
+  }
+
   Future<void> saveGameScore(int newScore) async {
     try {
       // Obtener el PlayerModel actual para no sobrescribir otros puntajes

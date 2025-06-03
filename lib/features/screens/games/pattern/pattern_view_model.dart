@@ -7,6 +7,16 @@ class PatternViewModel with ChangeNotifier {
 
   PatternViewModel({required this.userRepository});
 
+  Future<int> loadInitialScore() async {
+    try {
+      PlayerModel player = await userRepository.getCurrentPlayer();
+      return player.scorePattern ?? 0;
+    } catch (e) {
+      print('Error al cargar puntaje inicial de Pattern: $e');
+      return 0;
+    }
+  }
+
   Future<void> saveGameScore(int newScore) async {
     try {
       PlayerModel currentPlayer = await userRepository.getCurrentPlayer();

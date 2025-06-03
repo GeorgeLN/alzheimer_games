@@ -25,18 +25,27 @@ class _MemoramaScreenState extends State<MemoramaScreen> with TickerProviderStat
   @override
   void initState() {
     super.initState();
-    _viewModel = GetIt.I<MemoramaViewModel>(); // Initialize ViewModel
-    _generateCards();
+    _initializeGame();
   }
 
-  void _generateCards() {
+  Future<void> _initializeGame() async {
+    _viewModel = GetIt.I<MemoramaViewModel>(); // Initialize ViewModel
+    int initialScore = await _viewModel!.loadInitialScore();
+    _generateCards(initialScore: initialScore);
+  }
+
+  void _generateCards({int initialScore = 0}) {
     List<int> values = List.generate(gridSize * gridSize ~/ 2, (index) => index);
     values = [...values, ...values];
     values.shuffle(Random());
     cards = values.map((value) => CardModel(value: value)).toList();
-    score = 0;
+    score = initialScore;
     selectedIndices.clear();
-    setState(() {});
+    // It's important to check if the widget is still mounted before calling setState,
+    // especially after async operations.
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   void _onCardTap(int index) async {
@@ -91,7 +100,7 @@ class _MemoramaScreenState extends State<MemoramaScreen> with TickerProviderStat
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
-              _generateCards(); // Reinicia el juego
+              _generateCards(); // Reinicia el juego, score se reinicia a 0 por defecto
             },
             child: const Text('Jugar de Nuevo'),
           ),
@@ -128,7 +137,7 @@ class _MemoramaScreenState extends State<MemoramaScreen> with TickerProviderStat
           IconButton(
             icon: const Icon(Icons.refresh),
             tooltip: 'Reiniciar nivel',
-            onPressed: _generateCards,
+            onPressed: () => _generateCards(), // Reinicia el juego, score se reinicia a 0 por defecto
           ),
         ],
       ),
