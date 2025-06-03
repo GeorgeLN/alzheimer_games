@@ -27,18 +27,16 @@ class FirestoreService {
 
   //READ
   Future<PlayerModel> loadPlayer ({
-    final String user = 'OA504tapkjSaGRecQN5eLkfBLG13',
     required String userId,
   }) async {
-    final result = await _userRef.doc(user).get();
+    final result = await _userRef.doc(userId).get();
     return result.data()!;
   }
 
   Stream<PlayerModel> loadPlayerStream ({
-    final String user = 'OA504tapkjSaGRecQN5eLkfBLG13',
     required String userId,
   }) {
-    return firestore.collection('users').doc(user).snapshots().map((snapshot) {
+    return firestore.collection('users').doc(userId).snapshots().map((snapshot) {
       return PlayerModel.fromJson(snapshot.data()!);
     });
   }
@@ -51,16 +49,31 @@ class FirestoreService {
     int? scorePuzzle,
     int? scorePattern,
   }) async {
-    await _userRef.doc(
-      userId
-    ).set(
-      PlayerModel(
-        scoreMemory: scoreMemory ?? 0,
-        scoreTrivia: scoreTrivia ?? 0,
-        scorePuzzle: scorePuzzle ?? 0,
-        scorePattern: scorePattern ?? 0,
-      ),
-    );
+    final Map<String, Object?> scoresToUpdate = {};
+    if (scoreMemory != null) {
+      scoresToUpdate['score_memory'] = scoreMemory;
+    }
+    if (scoreTrivia != null) {
+      scoresToUpdate['score_trivia'] = scoreTrivia;
+    }
+    if (scorePuzzle != null) {
+      scoresToUpdate['score_puzzle'] = scorePuzzle;
+    }
+    if (scorePattern != null) {
+      scoresToUpdate['score_pattern'] = scorePattern;
+    }
+
+    if (scoresToUpdate.isNotEmpty) {
+      // Ensure userId is not null or empty before attempting to update.
+      if (userId != null && userId.isNotEmpty) {
+        await _userRef.doc(userId).update(scoresToUpdate);
+      } else {
+        // Handle the case where userId is null or empty, perhaps log an error or throw an exception.
+        print('Error: userId is null or empty in updateUser.');
+        // Depending on desired behavior, you might want to throw an exception:
+        // throw ArgumentError('userId cannot be null or empty for updateUser');
+      }
+    }
   }
 
   // SERVICES FOR TRIVIA GAME

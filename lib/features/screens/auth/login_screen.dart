@@ -1,3 +1,4 @@
+import 'package:alzheimer_games_app/features/bloc/bottom_nav_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:alzheimer_games_app/features/bloc/auth_cubit.dart';
@@ -28,9 +29,11 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _login() async {
     if (_formKey.currentState!.validate()) {
       context.read<AuthCubit>().signIn(
-            _emailController.text.trim(),
-            _passwordController.text.trim(),
-          );
+        _emailController.text.trim(),
+        _passwordController.text.trim(),
+      );
+      Navigator.of(context).pushReplacementNamed('/landing');
+      context.read<BottomNavCubit>().changeSelectedIndex(0);
     }
   }
 
@@ -100,7 +103,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: const Text('Iniciar Sesión'),
                     ),
               TextButton(
-                    onPressed: isLoading ? null : () {
+                  onPressed: isLoading ? null : () {
                   Navigator.of(context).pushNamed('/signup');
                 },
                 child: const Text('¿No tienes una cuenta? Regístrate'),

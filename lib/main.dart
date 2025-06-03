@@ -1,3 +1,5 @@
+import 'package:alzheimer_games_app/data/core/inject.dart';
+import 'package:alzheimer_games_app/data/repositories/user_repository.dart';
 import 'package:alzheimer_games_app/data/services/authentication/auth_service.dart';
 import 'package:alzheimer_games_app/data/services/firestore/firestore_service.dart';
 import 'package:alzheimer_games_app/firebase_options.dart';
@@ -22,6 +24,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  await setupInjection();
   runApp(
     MultiBlocProvider(
       providers: [
@@ -60,9 +63,10 @@ class MyApp extends StatelessWidget {
         '/memorama': (context) => const MemoramaScreen(),
         '/trivia': (context) => ChangeNotifierProvider(
           create: (context) => TriviaViewModel(
+            userRepository: UserRepository(authService: AuthService(FirebaseAuth.instance), firestoreService: FirestoreService(FirebaseFirestore.instance)),
             questionRepository: QuestionRepository(firestoreService: FirestoreService(FirebaseFirestore.instance)),
             firestoreService: FirestoreService(FirebaseFirestore.instance),
-            authService: AuthService(FirebaseAuth.instance), // Kept original services for TriviaViewModel
+            authService: AuthService(FirebaseAuth.instance),
           ),
           child: const TriviaScreen(),
         ),

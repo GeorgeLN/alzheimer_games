@@ -1,8 +1,43 @@
 
+import 'package:alzheimer_games_app/data/core/inject.dart';
+import 'package:alzheimer_games_app/data/models/user_model/user_model.dart';
+import 'package:alzheimer_games_app/data/repositories/user_repository.dart';
 import 'package:flutter/material.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  late final UserRepository _userRepository;
+  PlayerModel? _player;
+  bool _isLoading = true;
+  String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    _userRepository = inject<UserRepository>();
+    _fetchUserData();
+  }
+
+  Future<void> _fetchUserData() async {
+    try {
+      final player = await _userRepository.getCurrentPlayer();
+      setState(() {
+        _player = player;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'Error al cargar los datos del usuario: $e';
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -12,6 +47,9 @@ class HomeScreen extends StatelessWidget {
       {'nombre': 'Trivia', 'route': '/trivia'},
       {'nombre': 'Encaje de Figuras', 'route': '/encaje_figura'},
     ];
+
+    String firstName = _player?.userName ?? '';
+    firstName = firstName.split(' ')[0];
 
     return Scaffold(
       body: Column(
@@ -34,7 +72,7 @@ class HomeScreen extends StatelessWidget {
                         ),
                       ),
                       TextSpan(
-                        text: '_user.name,',
+                        text: firstName,
                         style: TextStyle(
                           color: Color(0xFF232946), // Azul oscuro
                           fontWeight: FontWeight.bold,
