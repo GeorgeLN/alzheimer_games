@@ -35,16 +35,24 @@ class TriviaViewModel with ChangeNotifier {
   final FirestoreService firestoreService;
   final AuthService authService;
 
-  Future<void> saveGameScore(int newScore) async { // Added saveGameScore method
+  Future<void> saveGameScore(int newScore) async {
     try {
       PlayerModel currentPlayer = await userRepository.getCurrentPlayer();
-      await userRepository.updateUser(
-        scoreTrivia: newScore,
-        scoreMemory: currentPlayer.scoreMemory,
-        scorePattern: currentPlayer.scorePattern,
-        scorePuzzle: currentPlayer.scorePuzzle,
-      );
-      print('Puntaje de Trivia guardado: $newScore');
+      int currentTriviaScore = currentPlayer.scoreTrivia ?? 0;
+
+      if (newScore > currentTriviaScore) {
+        await userRepository.updateUser(
+          scoreTrivia: newScore,
+          scoreMemory: currentPlayer.scoreMemory,
+          scorePattern: currentPlayer.scorePattern,
+          scorePuzzle: currentPlayer.scorePuzzle,
+        );
+        playerModel?.scoreTrivia = newScore; // Update local model
+        notifyListeners(); // Notify UI of change
+        print('Puntaje de Trivia actualizado y guardado: $newScore');
+      } else {
+        print('Puntaje de Trivia no guardado, el nuevo puntaje ($newScore) no es mayor que el actual ($currentTriviaScore).');
+      }
     } catch (e) {
       print('Error al guardar puntaje de Trivia: $e');
     }
