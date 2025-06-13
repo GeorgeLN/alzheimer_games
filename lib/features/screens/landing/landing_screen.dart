@@ -42,13 +42,17 @@ class _LandingScreenState extends State<LandingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 2, 2, 2),
-      //appBar: _LandingScreenAppBar(),
-      body: _LandingScreenBody(),
-      bottomNavigationBar: _LandingScreenBottomNavBar(context),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
-      //floatingActionButton: _LandingScreenFab(),
+    return PopScope(
+      canPop: false,
+      
+      child: Scaffold(
+        backgroundColor: const Color.fromARGB(255, 2, 2, 2),
+        //appBar: _LandingScreenAppBar(),
+        body: _LandingScreenBody(),
+        bottomNavigationBar: _LandingScreenBottomNavBar(context),
+        floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
+        //floatingActionButton: _LandingScreenFab(),
+      ),
     );
   }
 

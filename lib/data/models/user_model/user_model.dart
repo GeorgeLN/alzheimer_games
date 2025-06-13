@@ -20,7 +20,7 @@ class PlayerModel {
 
   final int? scoreMemory;
   final int? scorePuzzle;
-  final int? scoreTrivia;
+  late final int? scoreTrivia;
   final int? scorePattern;
   final String? userName;
   final String? userId;

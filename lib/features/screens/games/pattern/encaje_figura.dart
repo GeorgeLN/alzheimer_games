@@ -100,76 +100,88 @@ class _FiguraEncajeScreenState extends State<FiguraEncajeScreen> {
   Widget build(BuildContext context) {
     List<String> opciones = figuras.keys.toList()..shuffle();
 
-    return Scaffold(
-      appBar: AppBar(
-        actions: [
-          DropdownButton<String>(
-            value: nivel,
-            dropdownColor: Colors.grey[200],
-            items: niveles.map((n) {
-              return DropdownMenuItem(
-                value: n,
-                child: Text(n),
-              );
-            }).toList(),
-            onChanged: (value) {
-              if (value != null) {
-                _cambiarNivel(value);
-              }
+    return PopScope(
+      canPop: false,
+
+      child: Scaffold(
+        backgroundColor: Colors.white,
+
+        appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.pop(context);
             },
           ),
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            tooltip: 'Reiniciar juego',
-            onPressed: () {
-              // Al reiniciar, el score se establece a 0, y se llama a _cambiarNivel
-              // para regenerar las figuras del nivel actual con score 0.
-              _cambiarNivel(nivel, initialScore: 0);
-            },
-          )
-        ],
-      ),
-      body: Column(
-        //mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const SizedBox(height: 30),
-          Text('Puntaje: $score', style: const TextStyle(fontSize: 24)),
-          const SizedBox(height: 30),
-          const Text('Arrastra la figura correcta al contorno:', style: TextStyle(fontSize: 18)),
-          const SizedBox(height: 20),
-          Center(
-            child: DragTarget<String>(
-              onAccept: _verificarEncaje,
-              builder: (context, candidateData, rejectedData) => Container(
-                width: 200,
-                height: 200,
-                decoration: BoxDecoration(
-                  color: Colors.grey[700],
-                  borderRadius: BorderRadius.circular(12),
+          actions: [
+            DropdownButton<String>(
+              value: nivel,
+              dropdownColor: Colors.grey[200],
+              items: niveles.map((n) {
+                return DropdownMenuItem(
+                  value: n,
+                  child: Text(n),
+                );
+              }).toList(),
+              onChanged: (value) {
+                if (value != null) {
+                  _cambiarNivel(value);
+                }
+              },
+            ),
+            IconButton(
+              icon: const Icon(Icons.refresh),
+              tooltip: 'Reiniciar juego',
+              onPressed: () {
+                // Al reiniciar, el score se establece a 0, y se llama a _cambiarNivel
+                // para regenerar las figuras del nivel actual con score 0.
+                _cambiarNivel(nivel, initialScore: 0);
+              },
+            )
+          ],
+        ),
+        body: Column(
+          //mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const SizedBox(height: 30),
+            Text('Puntaje: $score', style: const TextStyle(fontSize: 24)),
+            const SizedBox(height: 30),
+            const Text('Arrastra la figura correcta al contorno:', style: TextStyle(fontSize: 18)),
+            const SizedBox(height: 20),
+            Center(
+              child: DragTarget<String>(
+                onAccept: _verificarEncaje,
+                builder: (context, candidateData, rejectedData) => Container(
+                  width: 200,
+                  height: 200,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[700],
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: figuraObjetivo != null
+                      ? Icon(figuras[figuraObjetivo], size: 100, color: Colors.white24)
+                      : const SizedBox(),
                 ),
-                child: figuraObjetivo != null
-                    ? Icon(figuras[figuraObjetivo], size: 100, color: Colors.white24)
-                    : const SizedBox(),
               ),
             ),
-          ),
-          const SizedBox(height: 40),
-          Wrap(
-            alignment: WrapAlignment.center,
-            spacing: 16,
-            children: opciones.map((figura) {
-              return Draggable<String>(
-                data: figura,
-                feedback: Icon(figuras[figura], size: 100, color: Colors.amber),
-                childWhenDragging: Opacity(
-                  opacity: 0.3,
+            const SizedBox(height: 40),
+            Wrap(
+              alignment: WrapAlignment.center,
+              spacing: 16,
+              children: opciones.map((figura) {
+                return Draggable<String>(
+                  data: figura,
+                  feedback: Icon(figuras[figura], size: 100, color: Colors.amber),
+                  childWhenDragging: Opacity(
+                    opacity: 0.3,
+                    child: Icon(figuras[figura], size: 100),
+                  ),
                   child: Icon(figuras[figura], size: 100),
-                ),
-                child: Icon(figuras[figura], size: 100),
-              );
-            }).toList(),
-          )
-        ],
+                );
+              }).toList(),
+            )
+          ],
+        ),
       ),
     );
   }

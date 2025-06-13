@@ -34,8 +34,8 @@ class AuthWrapperScreen extends StatelessWidget {
           // return const LoginScreen(); // O navegar si es preferible
           // Para mantener la consistencia con la navegación de rutas:
            WidgetsBinding.instance.addPostFrameCallback((_) {
-             if (ModalRoute.of(context)?.settings.name != '/login') {
-              Navigator.of(context).pushReplacementNamed('/login');
+             if (ModalRoute.of(context)?.settings.name != '/first') {
+              Navigator.of(context).pushReplacementNamed('/first');
              }
            });
           // Muestra un loader mientras se redirige para evitar parpadeos

@@ -8,7 +8,7 @@ import 'package:alzheimer_games_app/data/services/firestore/firestore_service.da
 // import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-enum TriviaStatus {
+enum TriviaS{
   content,
   loading,
   error,
@@ -16,7 +16,7 @@ enum TriviaStatus {
 }
 
 class TriviaViewModel with ChangeNotifier {
-  var status = TriviaStatus.loading;
+  var status = TriviaS.loading;
   final QuestionRepository questionRepository;
   final UserRepository userRepository; // Added UserRepository field
   QuestionModel? questionModel;
@@ -114,22 +114,22 @@ class TriviaViewModel with ChangeNotifier {
   }
 
   void emitError() {
-    status = TriviaStatus.error;
+    status = TriviaS.error;
     notifyListeners();
   }
 
   void emitLoading() {
-    status = TriviaStatus.loading;
+    status = TriviaS.loading;
     notifyListeners();
   }
 
   void emitContent() {
-    status = TriviaStatus.content;
+    status = TriviaS.content;
     notifyListeners();
   }
 
   void emitEmpty() {
-    status = TriviaStatus.empty;
+    status = TriviaS.empty;
     notifyListeners();
   }
 }

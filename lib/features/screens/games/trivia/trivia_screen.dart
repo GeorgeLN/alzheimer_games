@@ -105,12 +105,12 @@ class _TriviaScreenState extends State<TriviaScreen> {
     viewModel = context.watch();
     //QuestionModel q = questions[currentQuestion];
 
-    if (viewModel!.status == TriviaStatus.loading) {
+    if (viewModel!.status == TriviaS.loading) {
       return Scaffold(
         body: const Center(child: CircularProgressIndicator()),
       );
     }
-    if (viewModel!.status == TriviaStatus.error) {
+    if (viewModel!.status == TriviaS.error) {
       return Scaffold(
         body: const Center(child: Text('Error al cargar la pregunta')),
       );
@@ -118,54 +118,64 @@ class _TriviaScreenState extends State<TriviaScreen> {
 
     final q = viewModel!.questionModel!;
     
-    return Scaffold(
-      backgroundColor: Color.fromRGBO(241, 193, 100, 1),
-      appBar: AppBar(
+    return PopScope(
+      canPop: false,
+
+      child: Scaffold(
         backgroundColor: Color.fromRGBO(241, 193, 100, 1),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              'Pregunta ${viewModel!.currentQuestion + 1} de ${viewModel!.questionIds.length}',
-              style: const TextStyle(fontSize: 20),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              q.question,
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 30),
-            ...List.generate(q.options.length, (index) {
-              Color color = Colors.white;
-              if (answered) {
-                if (index == q.correctIndex) {
-                  color = Colors.green;
-                } else if (index == selectedAnswer) {
-                  color = Colors.red;
+        appBar: AppBar(
+          backgroundColor: Color.fromRGBO(241, 193, 100, 1),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                'Pregunta ${viewModel!.currentQuestion + 1} de ${viewModel!.questionIds.length}',
+                style: const TextStyle(fontSize: 20),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                q.question,
+                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 30),
+              ...List.generate(q.options.length, (index) {
+                Color color = Colors.white;
+                if (answered) {
+                  if (index == q.correctIndex) {
+                    color = Colors.green;
+                  } else if (index == selectedAnswer) {
+                    color = Colors.red;
+                  }
                 }
-              }
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 6.0),
-                child: ElevatedButton(
-                  onPressed: () => _selectAnswer(index),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: color,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 6.0),
+                  child: ElevatedButton(
+                    onPressed: () => _selectAnswer(index),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: color,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                    ),
+                    child: Text(q.options[index], style: const TextStyle(fontSize: 18, color: Colors.black)),
                   ),
-                  child: Text(q.options[index], style: const TextStyle(fontSize: 18, color: Colors.black)),
-                ),
-              );
-            }),
-            const SizedBox(height: 30),
-            Text('Puntaje de la partida: $score',
-                style: const TextStyle(fontSize: 22)),
-            const SizedBox(height: 10),
-            Text('Mejor Puntaje Trivia: $highestTriviaScore',
-                style: const TextStyle(fontSize: 20, color: Colors.black54)),
-          ],
+                );
+              }),
+              const SizedBox(height: 30),
+              Text('Puntaje de la partida: $score',
+                  style: const TextStyle(fontSize: 22)),
+              const SizedBox(height: 10),
+              Text('Mejor Puntaje Trivia: $highestTriviaScore',
+                  style: const TextStyle(fontSize: 20, color: Colors.black54)),
+            ],
+          ),
         ),
       ),
     );

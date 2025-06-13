@@ -113,76 +113,88 @@ class _MemoramaScreenState extends State<MemoramaScreen> with TickerProviderStat
   Widget build(BuildContext context) {
     //double cardSize = MediaQuery.of(context).size.width / gridSize - 20;
 
-    return Scaffold(
-      appBar: AppBar(
-        actions: [
-          DropdownButton<int>(
-            value: gridSize,
-            dropdownColor: Colors.grey[200],
-            items: gridOptions.map((size) {
-              return DropdownMenuItem(
-                value: size,
-                child: Text('${size}x$size'),
-              );
-            }).toList(),
-            onChanged: (value) {
-              if (value != null) {
-                setState(() {
-                  gridSize = value;
-                  _generateCards();
-                });
-              }
+    return PopScope(
+      canPop: false,
+
+      child: Scaffold(
+        backgroundColor: Colors.white,
+
+        appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.pop(context);
             },
           ),
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            tooltip: 'Reiniciar nivel',
-            onPressed: () => _generateCards(), // Reinicia el juego, score se reinicia a 0 por defecto
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text('Puntaje: $score', style: const TextStyle(fontSize: 24)),
-          ),
-          Expanded(
-            child: GridView.builder(
-              padding: const EdgeInsets.all(16),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: gridSize,
-                mainAxisSpacing: 8,
-                crossAxisSpacing: 8,
-              ),
-              itemCount: cards.length,
-              itemBuilder: (context, index) {
-                return GestureDetector(
-                  onTap: () => _onCardTap(index),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 300),
-                    decoration: BoxDecoration(
-                      color: cards[index].isFlipped || cards[index].isMatched
-                          ? Colors.amber
-                          : Colors.grey[800],
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Center(
-                      child: AnimatedOpacity(
-                        opacity: cards[index].isFlipped || cards[index].isMatched ? 1 : 0,
-                        duration: const Duration(milliseconds: 300),
-                        child: Text(
-                          '${cards[index].value}',
-                          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          actions: [
+            DropdownButton<int>(
+              value: gridSize,
+              dropdownColor: Colors.grey[200],
+              items: gridOptions.map((size) {
+                return DropdownMenuItem(
+                  value: size,
+                  child: Text('${size}x$size'),
+                );
+              }).toList(),
+              onChanged: (value) {
+                if (value != null) {
+                  setState(() {
+                    gridSize = value;
+                    _generateCards();
+                  });
+                }
+              },
+            ),
+            IconButton(
+              icon: const Icon(Icons.refresh),
+              tooltip: 'Reiniciar nivel',
+              onPressed: () => _generateCards(), // Reinicia el juego, score se reinicia a 0 por defecto
+            ),
+          ],
+        ),
+        body: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text('Puntaje: $score', style: const TextStyle(fontSize: 24)),
+            ),
+            Expanded(
+              child: GridView.builder(
+                padding: const EdgeInsets.all(16),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: gridSize,
+                  mainAxisSpacing: 8,
+                  crossAxisSpacing: 8,
+                ),
+                itemCount: cards.length,
+                itemBuilder: (context, index) {
+                  return GestureDetector(
+                    onTap: () => _onCardTap(index),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      decoration: BoxDecoration(
+                        color: cards[index].isFlipped || cards[index].isMatched
+                            ? Colors.amber
+                            : Colors.grey[800],
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Center(
+                        child: AnimatedOpacity(
+                          opacity: cards[index].isFlipped || cards[index].isMatched ? 1 : 0,
+                          duration: const Duration(milliseconds: 300),
+                          child: Text(
+                            '${cards[index].value}',
+                            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

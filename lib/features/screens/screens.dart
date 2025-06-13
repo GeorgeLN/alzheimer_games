@@ -6,3 +6,7 @@ export 'package:alzheimer_games_app/features/screens/games/puzzle/slide_puzzle_s
 export 'package:alzheimer_games_app/features/screens/games/pattern/encaje_figura.dart';
 export 'package:alzheimer_games_app/features/screens/profile/profile_screen.dart';
 export 'package:alzheimer_games_app/features/screens/landing/landing_screen.dart';
+export 'package:alzheimer_games_app/features/screens/auth/login_screen.dart';
+export 'package:alzheimer_games_app/features/screens/auth/signup_screen.dart';
+export 'package:alzheimer_games_app/features/screens/auth/first_screen.dart';
+export 'package:alzheimer_games_app/features/screens/auth/auth_wrapper_screen.dart';

@@ -132,85 +132,96 @@ class _SlidePuzzleScreenState extends State<SlidePuzzleScreen> {
   Widget build(BuildContext context) {
     // double tileSize = MediaQuery.of(context).size.width / gridSize - 12;
 
-    return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 55, 140, 211),
-      appBar: AppBar(
-        backgroundColor: Color.fromARGB(255, 55, 140, 211),
-        title: const Text('Puzzle de Números', style: TextStyle(color: Colors.black)),
-        actions: [
-          DropdownButton<int>(
-            value: gridSize,
-            dropdownColor: Colors.white,
-            items: gridOptions.map((size) {
-              return DropdownMenuItem(
-                value: size,
-                child: Text('${size}x$size', style: TextStyle(color: Colors.black)),
-              );
-            }).toList(),
-            onChanged: (value) {
-              if (value != null) {
-                setState(() {
-                  gridSize = value;
-                  _initializePuzzle();
-                });
-              }
+    return PopScope(
+      canPop: false,
+
+      child: Scaffold(
+        backgroundColor: const Color.fromARGB(255, 55, 140, 211),
+
+        appBar: AppBar(
+          backgroundColor: Color.fromARGB(255, 55, 140, 211),
+          title: const Text('Puzzle de Números', style: TextStyle(color: Colors.black)),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.pop(context);
             },
           ),
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            tooltip: 'Reiniciar nivel',
-            onPressed: _initializePuzzle,
-            color: Colors.black,
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Text(
-              isCompleted 
-                  ? '¡Resuelto! Puntaje: $finalScore (Movimientos: $score)\nMejor Puntaje: $highestOrLastPuzzleScore' 
-                  : 'Movimientos: $score\nMejor Puntaje: $highestOrLastPuzzleScore',
-              style: const TextStyle(fontSize: 24, color: Colors.black),
-              textAlign: TextAlign.center,
+          actions: [
+            DropdownButton<int>(
+              value: gridSize,
+              dropdownColor: Colors.white,
+              items: gridOptions.map((size) {
+                return DropdownMenuItem(
+                  value: size,
+                  child: Text('${size}x$size', style: TextStyle(color: Colors.black)),
+                );
+              }).toList(),
+              onChanged: (value) {
+                if (value != null) {
+                  setState(() {
+                    gridSize = value;
+                    _initializePuzzle();
+                  });
+                }
+              },
             ),
-          ),
-          Expanded(
-            child: GridView.builder(
-              padding: const EdgeInsets.all(16),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: gridSize,
-                mainAxisSpacing: 8,
-                crossAxisSpacing: 8,
+            IconButton(
+              icon: const Icon(Icons.refresh),
+              tooltip: 'Reiniciar nivel',
+              onPressed: _initializePuzzle,
+              color: Colors.black,
+            ),
+          ],
+        ),
+        body: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                isCompleted 
+                    ? '¡Resuelto! Puntaje: $finalScore (Movimientos: $score)\nMejor Puntaje: $highestOrLastPuzzleScore' 
+                    : 'Movimientos: $score\nMejor Puntaje: $highestOrLastPuzzleScore',
+                style: const TextStyle(fontSize: 24, color: Colors.black),
+                textAlign: TextAlign.center,
               ),
-              itemCount: tiles.length,
-              itemBuilder: (context, index) {
-                return GestureDetector(
-                  onTap: isCompleted ? null : () => _moveTile(index),
-                  onHorizontalDragEnd: isCompleted ? null : (details) => _handleSwipe(index, details),
-                  onVerticalDragEnd: isCompleted ? null : (details) => _handleSwipe(index, details),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    decoration: BoxDecoration(
-                      color: tiles[index] == 0 ? Colors.transparent : const Color.fromRGBO(241, 193, 100, 1),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Center(
-                      child: Text(
-                        tiles[index] == 0 ? '' : '${tiles[index]}',
-                        style: const TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
+            ),
+            Expanded(
+              child: GridView.builder(
+                padding: const EdgeInsets.all(16),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: gridSize,
+                  mainAxisSpacing: 8,
+                  crossAxisSpacing: 8,
+                ),
+                itemCount: tiles.length,
+                itemBuilder: (context, index) {
+                  return GestureDetector(
+                    onTap: isCompleted ? null : () => _moveTile(index),
+                    onHorizontalDragEnd: isCompleted ? null : (details) => _handleSwipe(index, details),
+                    onVerticalDragEnd: isCompleted ? null : (details) => _handleSwipe(index, details),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      decoration: BoxDecoration(
+                        color: tiles[index] == 0 ? Colors.transparent : const Color.fromRGBO(241, 193, 100, 1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Center(
+                        child: Text(
+                          tiles[index] == 0 ? '' : '${tiles[index]}',
+                          style: const TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
