@@ -12,21 +12,7 @@ class FiguraEncajeScreen extends StatefulWidget {
 }
 
 class _FiguraEncajeScreenState extends State<FiguraEncajeScreen> {
-  final Map<String, IconData> figurasFacil = {
-    'Círculo': Icons.circle,
-    'Cuadrado': Icons.square,
-    'Triángulo': Icons.change_history_rounded,
-  };
-
-  final Map<String, IconData> figurasMedio = {
-    'Círculo': Icons.circle,
-    'Cuadrado': Icons.square,
-    'Triángulo': Icons.change_history_rounded,
-    'Estrella': Icons.star,
-    'Corazón': Icons.favorite,
-  };
-
-  final Map<String, IconData> figurasDificil = {
+  final Map<String, IconData> todasLasFiguras = {
     'Círculo': Icons.circle,
     'Cuadrado': Icons.square,
     'Triángulo': Icons.change_history_rounded,
@@ -36,14 +22,13 @@ class _FiguraEncajeScreenState extends State<FiguraEncajeScreen> {
     'Pentágono': Icons.pentagon,
   };
 
-  late Map<String, IconData> figuras;
+  late Map<String, IconData> figurasEnJuego; // Figures currently in the game
+  late Map<String, IconData> figuras; // Figures displayed in the UI, same as figurasEnJuego
 
   String? figuraObjetivo;
   String? figuraArrastrada;
   int score = 0;
-  String nivel = 'Fácil';
-
-  final List<String> niveles = ['Fácil', 'Medio', 'Difícil'];
+  int correctasConsecutivas = 0; // Track consecutive correct answers
   PatternViewModel? _viewModel; // ViewModel instance
 
   @override
@@ -52,53 +37,69 @@ class _FiguraEncajeScreenState extends State<FiguraEncajeScreen> {
     _initializeGameScreen();
   }
 
-  Future<void> _initializeGameScreen() async {
-    _viewModel = GetIt.I<PatternViewModel>(); // Initialize ViewModel
-    int initialScore = await _viewModel!.loadInitialScore();
-    // Asegurarse de que el widget sigue montado después de la operación asíncrona
+  Future<void> _initializeGameScreen({bool reinicio = false}) async {
+    if (!reinicio) {
+      _viewModel = GetIt.I<PatternViewModel>(); // Initialize ViewModel only once
+    }
+    // Load score from ViewModel, but don't use it for initial game score here.
+    // The game score always starts at 0.
+    await _viewModel!.loadInitialScore();
+    int initialScore = 0;
+
     if (mounted) {
-      _cambiarNivel(nivel, initialScore: initialScore);
+      correctasConsecutivas = 0;
+      var allKeys = todasLasFiguras.keys.toList()..shuffle();
+      figurasEnJuego = {};
+      for (int i = 0; i < 3 && i < allKeys.length; i++) {
+        figurasEnJuego[allKeys[i]] = todasLasFiguras[allKeys[i]]!;
+      }
+      figuras = Map.from(figurasEnJuego); // Initialize UI figures
+      score = initialScore;
+      _nuevaFiguraObjetivo();
     }
   }
 
   void _nuevaFiguraObjetivo() {
-    figuraObjetivo = (figuras.keys.toList()..shuffle()).first;
+    if (figurasEnJuego.isEmpty) return; // Avoid error if no figures
+    figuraObjetivo = (figurasEnJuego.keys.toList()..shuffle()).first;
     figuraArrastrada = null;
     setState(() {});
   }
 
   void _verificarEncaje(String figura) {
-    if (figura == figuraObjetivo) {
-      setState(() {
-        score += 10;
-      });
-      _viewModel?.saveGameScore(score); // Save score after updating
-    } else {
-      setState(() {
-        score = score > 0 ? score - 1 : 0;
-      });
-    }
-    Future.delayed(const Duration(seconds: 1), _nuevaFiguraObjetivo);
-  }
-
-  void _cambiarNivel(String nuevoNivel, {int initialScore = 0}) {
     setState(() {
-      nivel = nuevoNivel;
-      if (nivel == 'Fácil') {
-        figuras = figurasFacil;
-      } else if (nivel == 'Medio') {
-        figuras = figurasMedio;
+      if (figura == figuraObjetivo) {
+        score += 10;
+        correctasConsecutivas++;
+        if (correctasConsecutivas == 2) {
+          correctasConsecutivas = 0;
+          if (figurasEnJuego.length < todasLasFiguras.length) {
+            var figurasDisponibles = todasLasFiguras.keys
+                .where((key) => !figurasEnJuego.containsKey(key))
+                .toList();
+            if (figurasDisponibles.isNotEmpty) {
+              var nuevaFiguraKey = (figurasDisponibles..shuffle()).first;
+              figurasEnJuego[nuevaFiguraKey] = todasLasFiguras[nuevaFiguraKey]!;
+              figuras = Map.from(figurasEnJuego); // Update UI figures
+            }
+          }
+        }
       } else {
-        figuras = figurasDificil;
+        score = score > 0 ? score - 1 : 0;
+        correctasConsecutivas = 0;
       }
-      score = initialScore; // Usar initialScore aquí
-      _nuevaFiguraObjetivo();
     });
+    _viewModel?.saveGameScore(score); // Save score after updating
+    Future.delayed(const Duration(seconds: 1), _nuevaFiguraObjetivo);
   }
 
   @override
   Widget build(BuildContext context) {
-    List<String> opciones = figuras.keys.toList()..shuffle();
+    if (figurasEnJuego.isEmpty) {
+      // Handle the case where figures might not be initialized yet, though _initializeGameScreen should prevent this.
+      return Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+    List<String> opciones = figurasEnJuego.keys.toList()..shuffle();
 
     return PopScope(
       canPop: false,
@@ -114,28 +115,11 @@ class _FiguraEncajeScreenState extends State<FiguraEncajeScreen> {
             },
           ),
           actions: [
-            DropdownButton<String>(
-              value: nivel,
-              dropdownColor: Colors.grey[200],
-              items: niveles.map((n) {
-                return DropdownMenuItem(
-                  value: n,
-                  child: Text(n),
-                );
-              }).toList(),
-              onChanged: (value) {
-                if (value != null) {
-                  _cambiarNivel(value);
-                }
-              },
-            ),
             IconButton(
               icon: const Icon(Icons.refresh),
               tooltip: 'Reiniciar juego',
               onPressed: () {
-                // Al reiniciar, el score se establece a 0, y se llama a _cambiarNivel
-                // para regenerar las figuras del nivel actual con score 0.
-                _cambiarNivel(nivel, initialScore: 0);
+                _initializeGameScreen(reinicio: true);
               },
             )
           ],
@@ -158,8 +142,8 @@ class _FiguraEncajeScreenState extends State<FiguraEncajeScreen> {
                     color: Colors.grey[700],
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: figuraObjetivo != null
-                      ? Icon(figuras[figuraObjetivo], size: 100, color: Colors.white24)
+                  child: figuraObjetivo != null && figurasEnJuego.containsKey(figuraObjetivo)
+                      ? Icon(figurasEnJuego[figuraObjetivo], size: 100, color: Colors.white24)
                       : const SizedBox(),
                 ),
               ),
@@ -168,15 +152,15 @@ class _FiguraEncajeScreenState extends State<FiguraEncajeScreen> {
             Wrap(
               alignment: WrapAlignment.center,
               spacing: 16,
-              children: opciones.map((figura) {
+              children: opciones.map((figuraNombre) {
                 return Draggable<String>(
-                  data: figura,
-                  feedback: Icon(figuras[figura], size: 100, color: Colors.amber),
+                  data: figuraNombre,
+                  feedback: Icon(figurasEnJuego[figuraNombre], size: 100, color: Colors.amber),
                   childWhenDragging: Opacity(
                     opacity: 0.3,
-                    child: Icon(figuras[figura], size: 100),
+                    child: Icon(figurasEnJuego[figuraNombre], size: 100),
                   ),
-                  child: Icon(figuras[figura], size: 100),
+                  child: Icon(figurasEnJuego[figuraNombre], size: 100),
                 );
               }).toList(),
             )
