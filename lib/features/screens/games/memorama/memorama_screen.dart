@@ -117,11 +117,14 @@ class _MemoramaScreenState extends State<MemoramaScreen> with TickerProviderStat
       canPop: false,
 
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: Color.fromRGBO(146, 122, 255, 1),
 
         appBar: AppBar(
+          backgroundColor: Color.fromRGBO(146, 122, 255, 1),
+          title: const Text('Memorama', style: TextStyle(color: Colors.black)),
+          centerTitle: true,
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
+            icon: const Icon(Icons.arrow_back, color: Colors.black),
             onPressed: () {
               Navigator.pop(context);
             },
@@ -156,7 +159,7 @@ class _MemoramaScreenState extends State<MemoramaScreen> with TickerProviderStat
           children: [
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Text('Puntaje: $score', style: const TextStyle(fontSize: 24)),
+              child: Text('Puntaje: $score', style: const TextStyle(fontSize: 24, color: Colors.white, fontWeight: FontWeight.bold)),
             ),
             Expanded(
               child: GridView.builder(

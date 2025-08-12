@@ -105,11 +105,14 @@ class _FiguraEncajeScreenState extends State<FiguraEncajeScreen> {
       canPop: false,
 
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: Color.fromRGBO(146, 122, 255, 1),
 
         appBar: AppBar(
+          backgroundColor: Color.fromRGBO(146, 122, 255, 1),
+          title: const Text('Encaje de Figuras', style: TextStyle(color: Colors.black)),
+          centerTitle: true,
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
+            icon: const Icon(Icons.arrow_back, color: Colors.black),
             onPressed: () {
               Navigator.pop(context);
             },
@@ -128,9 +131,9 @@ class _FiguraEncajeScreenState extends State<FiguraEncajeScreen> {
           //mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const SizedBox(height: 30),
-            Text('Puntaje: $score', style: const TextStyle(fontSize: 24)),
+            Text('Puntaje: $score', style: const TextStyle(fontSize: 24, color: Colors.white, fontWeight: FontWeight.bold)),
             const SizedBox(height: 30),
-            const Text('Arrastra la figura correcta al contorno:', style: TextStyle(fontSize: 18)),
+            const Text('Arrastra la figura correcta al contorno:', style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
             const SizedBox(height: 20),
             Center(
               child: DragTarget<String>(

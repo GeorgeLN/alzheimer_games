@@ -122,11 +122,14 @@ class _TriviaScreenState extends State<TriviaScreen> {
       canPop: false,
 
       child: Scaffold(
-        backgroundColor: Color.fromRGBO(241, 193, 100, 1),
+        backgroundColor: Color.fromRGBO(146, 122, 255, 1),
         appBar: AppBar(
-          backgroundColor: Color.fromRGBO(241, 193, 100, 1),
+          backgroundColor: Color.fromRGBO(146, 122, 255, 1),
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
+            icon: const Icon(
+              Icons.arrow_back,
+              color: Colors.white,
+            ),
             onPressed: () {
               Navigator.pop(context);
             },
@@ -139,12 +142,20 @@ class _TriviaScreenState extends State<TriviaScreen> {
             children: [
               Text(
                 'Pregunta ${viewModel!.currentQuestion + 1} de ${viewModel!.questionIds.length}',
-                style: const TextStyle(fontSize: 20),
+                style: const TextStyle(
+                  fontSize: 20,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 20),
               Text(
                 q.question,
-                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
               ),
               const SizedBox(height: 30),
               ...List.generate(q.options.length, (index) {
@@ -170,10 +181,14 @@ class _TriviaScreenState extends State<TriviaScreen> {
               }),
               const SizedBox(height: 30),
               Text('Puntaje de la partida: $score',
-                  style: const TextStyle(fontSize: 22)),
+                  style: const TextStyle(
+                    fontSize: 22,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  )),
               const SizedBox(height: 10),
-              Text('Mejor Puntaje Trivia: $highestTriviaScore',
-                  style: const TextStyle(fontSize: 20, color: Colors.black54)),
+              // Text('Mejor Puntaje Trivia: $highestTriviaScore',
+              //     style: const TextStyle(fontSize: 20, color: Colors.black54)),
             ],
           ),
         ),

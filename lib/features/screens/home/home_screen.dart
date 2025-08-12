@@ -78,7 +78,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         TextSpan(
                           text: 'Hola! ',
                           style: TextStyle(
-                            color: Color(0xFFFFB74D), // Naranja
+                            color: Color.fromRGBO(146, 122, 255, 1), // Naranja
                             fontWeight: FontWeight.bold,
                             fontSize: size.width * 0.08,
                           ),

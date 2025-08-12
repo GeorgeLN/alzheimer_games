@@ -86,7 +86,7 @@ class FirstScreen extends StatelessWidget {
                         child: Text(
                           'Registrarse',
                           style: TextStyle(
-                            color: Color.fromRGBO(236, 165, 82, 1),
+                            color: Color.fromRGBO(146, 122, 255, 1),
                             fontSize: size.width * 0.055,
                             fontWeight: FontWeight.w600,
                           ),

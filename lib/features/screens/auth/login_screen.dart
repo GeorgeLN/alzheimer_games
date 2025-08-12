@@ -180,7 +180,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         onPressed: _login,
                       
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Color.fromRGBO(236, 165, 82, 1),
+                          backgroundColor: Color.fromRGBO(146, 122, 255, 1),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),

@@ -136,13 +136,13 @@ class _SlidePuzzleScreenState extends State<SlidePuzzleScreen> {
       canPop: false,
 
       child: Scaffold(
-        backgroundColor: const Color.fromARGB(255, 55, 140, 211),
+        backgroundColor: const Color.fromRGBO(146, 122, 255, 1),
 
         appBar: AppBar(
-          backgroundColor: Color.fromARGB(255, 55, 140, 211),
+          backgroundColor: const Color.fromRGBO(146, 122, 255, 1),
           title: const Text('Puzzle de Números', style: TextStyle(color: Colors.black)),
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
+            icon: const Icon(Icons.arrow_back, color: Colors.black),
             onPressed: () {
               Navigator.pop(context);
             },
@@ -167,10 +167,9 @@ class _SlidePuzzleScreenState extends State<SlidePuzzleScreen> {
               },
             ),
             IconButton(
-              icon: const Icon(Icons.refresh),
+              icon: const Icon(Icons.refresh, color: Colors.white),
               tooltip: 'Reiniciar nivel',
               onPressed: _initializePuzzle,
-              color: Colors.black,
             ),
           ],
         ),
@@ -182,7 +181,7 @@ class _SlidePuzzleScreenState extends State<SlidePuzzleScreen> {
                 isCompleted 
                     ? '¡Resuelto! Puntaje: $finalScore (Movimientos: $score)\nMejor Puntaje: $highestOrLastPuzzleScore' 
                     : 'Movimientos: $score\nMejor Puntaje: $highestOrLastPuzzleScore',
-                style: const TextStyle(fontSize: 24, color: Colors.black),
+                style: const TextStyle(fontSize: 24, color: Colors.white, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
               ),
             ),
