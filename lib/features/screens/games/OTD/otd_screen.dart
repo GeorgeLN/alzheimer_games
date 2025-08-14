@@ -38,9 +38,9 @@ class _OneTouchGameState extends State<OneTouchGame> {
     });
   }
 
-  void _onPanStart(Offset position, Offset puzzleOffset) {
+  void _onPanStart(Offset position, Offset puzzleOffset, double scale) {
     for (int i = 0; i < nodes.length; i++) {
-      final nodePosition = nodes[i].position + puzzleOffset;
+      final nodePosition = nodes[i].position * scale + puzzleOffset;
       if ((nodePosition - position).distance < 25) {
         setState(() {
           currentNode = i;
@@ -50,18 +50,18 @@ class _OneTouchGameState extends State<OneTouchGame> {
     }
   }
 
-  void _onPanUpdate(Offset position, Offset puzzleOffset) {
+  void _onPanUpdate(Offset position, Offset puzzleOffset, double scale) {
     if (currentNode == null) return;
 
     for (int i = 0; i < nodes.length; i++) {
       if (i == currentNode) continue;
 
-      final nodePosition = nodes[i].position + puzzleOffset;
+      final nodePosition = nodes[i].position * scale + puzzleOffset;
       if ((nodePosition - position).distance < 25) {
         final lineIndex = lines.indexWhere((line) =>
-          ((line.startNodeIndex == currentNode && line.endNodeIndex == i) ||
-          (line.endNodeIndex == currentNode && line.startNodeIndex == i)) &&
-          !line.isDrawn,
+        ((line.startNodeIndex == currentNode && line.endNodeIndex == i) ||
+            (line.endNodeIndex == currentNode && line.startNodeIndex == i)) &&
+            !line.isDrawn,
         );
 
         if (lineIndex != -1) {
@@ -111,26 +111,6 @@ class _OneTouchGameState extends State<OneTouchGame> {
     );
   }
 
-  Offset _calculatePuzzleOffset(Size size) {
-    if (nodes.isEmpty) return Offset.zero;
-
-    double minX = double.infinity, minY = double.infinity;
-    double maxX = double.negativeInfinity, maxY = double.negativeInfinity;
-    for (var node in nodes) {
-      minX = min(minX, node.position.dx);
-      minY = min(minY, node.position.dy);
-      maxX = max(maxX, node.position.dx);
-      maxY = max(maxY, node.position.dy);
-    }
-    final puzzleWidth = maxX - minX;
-    final puzzleHeight = maxY - minY;
-    final puzzleCenterX = minX + puzzleWidth / 2;
-    final puzzleCenterY = minY + puzzleHeight / 2;
-
-    final center = size.center(Offset.zero);
-    return Offset(center.dx - puzzleCenterX, center.dy - puzzleCenterY);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -155,14 +135,40 @@ class _OneTouchGameState extends State<OneTouchGame> {
       ),
       body: LayoutBuilder(
         builder: (context, constraints) {
-          final size = Size(constraints.maxWidth, constraints.maxHeight);
-          final puzzleOffset = _calculatePuzzleOffset(size);
+          if (nodes.isEmpty) return Container(color: Colors.deepPurple.shade50);
+
+          double minX = double.infinity, minY = double.infinity;
+          double maxX = double.negativeInfinity, maxY = double.negativeInfinity;
+          for (var node in nodes) {
+            minX = min(minX, node.position.dx);
+            minY = min(minY, node.position.dy);
+            maxX = max(maxX, node.position.dx);
+            maxY = max(maxY, node.position.dy);
+          }
+
+          final puzzleWidth = maxX - minX;
+          final puzzleHeight = maxY - minY;
+
+          final availableWidth = constraints.maxWidth * 0.8; // 80% of width for padding
+          final availableHeight = constraints.maxHeight * 0.8; // 80% of height for padding
+
+          final scaleX = availableWidth / puzzleWidth;
+          final scaleY = availableHeight / puzzleHeight;
+          final scale = min(scaleX, scaleY);
+
+          final scaledPuzzleWidth = puzzleWidth * scale;
+          final scaledPuzzleHeight = puzzleHeight * scale;
+
+          final puzzleCenterX = minX * scale + scaledPuzzleWidth / 2;
+          final puzzleCenterY = minY * scale + scaledPuzzleHeight / 2;
+
+          final screenCenter = constraints.biggest.center(Offset.zero);
+          final puzzleOffset = Offset(screenCenter.dx - puzzleCenterX, screenCenter.dy - puzzleCenterY);
 
           return GestureDetector(
-            onPanStart: (details) => _onPanStart(details.localPosition, puzzleOffset),
-            onPanUpdate: (details) => _onPanUpdate(details.localPosition, puzzleOffset),
+            onPanStart: (details) => _onPanStart(details.localPosition, puzzleOffset, scale),
+            onPanUpdate: (details) => _onPanUpdate(details.localPosition, puzzleOffset, scale),
             onPanEnd: (_) {
-              // Si el dedo se levanta antes de completar el nivel, reiniciarlo
               if (!isLevelComplete) {
                 _loadLevel(currentLevelIndex);
               }
@@ -171,7 +177,7 @@ class _OneTouchGameState extends State<OneTouchGame> {
               color: Colors.deepPurple.shade50,
               child: CustomPaint(
                 size: Size.infinite,
-                painter: PuzzlePainter(nodes, lines, currentNode, puzzleOffset),
+                painter: PuzzlePainter(nodes, lines, currentNode, puzzleOffset, scale),
               ),
             ),
           );
@@ -186,8 +192,9 @@ class PuzzlePainter extends CustomPainter {
   final List<Line> lines;
   final int? currentNode;
   final Offset puzzleOffset;
+  final double scale;
 
-  PuzzlePainter(this.nodes, this.lines, this.currentNode, this.puzzleOffset);
+  PuzzlePainter(this.nodes, this.lines, this.currentNode, this.puzzleOffset, this.scale);
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -199,8 +206,8 @@ class PuzzlePainter extends CustomPainter {
 
     // Dibujar líneas
     for (var line in lines) {
-      final p1 = nodes[line.startNodeIndex].position + puzzleOffset;
-      final p2 = nodes[line.endNodeIndex].position + puzzleOffset;
+      final p1 = nodes[line.startNodeIndex].position * scale + puzzleOffset;
+      final p2 = nodes[line.endNodeIndex].position * scale + puzzleOffset;
       linePaint.color = line.isDrawn ? Colors.greenAccent : Colors.grey.shade400;
       canvas.drawLine(p1, p2, linePaint);
     }
@@ -208,7 +215,7 @@ class PuzzlePainter extends CustomPainter {
     // Dibujar nodos
     for (int i = 0; i < nodes.length; i++) {
       final node = nodes[i];
-      final position = node.position + puzzleOffset;
+      final position = node.position * scale + puzzleOffset;
       if (i == currentNode) {
         nodePaint.color = Colors.orangeAccent;
         canvas.drawCircle(position, 18, nodePaint);
@@ -220,7 +227,4 @@ class PuzzlePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
-
-  double min(double a, double b) => a < b ? a : b;
-  double max(double a, double b) => a > b ? a : b;
 }
