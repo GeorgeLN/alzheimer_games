@@ -1,6 +1,6 @@
 import 'package:alzheimer_games_app/features/screens/games/trivia/trivia_view_model.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
 
 class TriviaScreen extends StatefulWidget {
   const TriviaScreen({super.key});
@@ -10,91 +10,101 @@ class TriviaScreen extends StatefulWidget {
 }
 
 class _TriviaScreenState extends State<TriviaScreen> {
-
-  TriviaViewModel? viewModel;
+  TriviaViewModel? _viewModel;
 
   @override
   void initState() {
     super.initState();
-    viewModel = context.read();
-
+    _viewModel = context.read<TriviaViewModel>();
+    _viewModel?.addListener(_onViewModelChanged);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      viewModel?.initialize();
-      // Listen to changes in viewModel to update highestTriviaScore
-      viewModel?.addListener(_updateHighestScoreFromViewModel);
+      _viewModel?.initialize();
     });
-  }
-
-  void _updateHighestScoreFromViewModel() {
-    if (mounted && viewModel?.playerModel?.scoreTrivia != null) {
-      setState(() {
-        highestTriviaScore = viewModel!.playerModel!.scoreTrivia ?? 0;
-      });
-    }
   }
 
   @override
   void dispose() {
-    viewModel?.removeListener(_updateHighestScoreFromViewModel);
+    _viewModel?.removeListener(_onViewModelChanged);
     super.dispose();
   }
 
-  int score = 0;
-  int highestTriviaScore = 0; // Added state variable
-  bool answered = false;
-  int? selectedAnswer;
-
-  void _selectAnswer(int index) {
-    if (answered) return;
-    setState(() {
-      selectedAnswer = index;
-      answered = true;
-      if (index == viewModel!.questionModel!.correctIndex) {
-        score += 10;
-      }
-    });
-    Future.delayed(const Duration(seconds: 2), () {
-      if (viewModel!.currentQuestion < viewModel!.questionIds.length - 1) {
-        viewModel!.nextQuestion();
-        selectedAnswer = null;
-        answered = false;
-      } else {
-        _showFinalDialog();
-      }
-    });
+  void _onViewModelChanged() {
+    final state = _viewModel?.state;
+    if (state == TriviaState.levelUp) {
+      _showLevelUpDialog();
+    } else if (state == TriviaState.repeatLevel) {
+      _showRepeatLevelDialog();
+    } else if (state == TriviaState.gameFinished) {
+      _showGameFinishedDialog();
+    }
   }
 
-  void _showFinalDialog() {
-    // Guardar el puntaje de la sesión actual (la lógica de si es mayor está en el VM)
-    viewModel?.saveGameScore(score);
+  void _selectAnswer(int index) {
+    _viewModel?.checkAnswer(index);
+  }
 
-    // Actualizar el highestTriviaScore local si el score actual es mayor
-    if (score > highestTriviaScore) {
-      if (mounted) {
-        setState(() {
-          highestTriviaScore = score;
-        });
-      }
-    }
-
+  void _showLevelUpDialog() {
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (_) => AlertDialog(
-        title: const Text('¡Juego Terminado!'),
-        content: Text('Puntaje final: $score'),
+        title: const Text('¡Nivel Completado!'),
+        content: Text('¡Felicidades! Has avanzado al Nivel ${_viewModel?.currentLevel}.'),
         actions: [
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
-              setState(() {
-                viewModel!.resetQuestion();
-                score = 0;
-                selectedAnswer = null;
-                answered = false;
-              });
+              _viewModel?.nextLevel();
             },
-            child: const Text('Reiniciar'),
+            child: const Text('Continuar'),
           )
+        ],
+      ),
+    );
+  }
+
+  void _showRepeatLevelDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => AlertDialog(
+        title: const Text('¡Nivel Fallido!'),
+        content: const Text('No has contestado todas las preguntas correctamente. Debes repetir el nivel.'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              _viewModel?.repeatLevel();
+            },
+            child: const Text('Reintentar'),
+          )
+        ],
+      ),
+    );
+  }
+
+  void _showGameFinishedDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => AlertDialog(
+        title: const Text('¡Juego Completado!'),
+        content: const Text('¡Felicidades! Has completado todos los niveles.'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              _viewModel?.restartGame();
+            },
+            child: const Text('Jugar de Nuevo'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              Navigator.of(context).pop(); // Go back from trivia screen
+            },
+            child: const Text('Salir'),
+          ),
         ],
       ),
     );
@@ -102,96 +112,76 @@ class _TriviaScreenState extends State<TriviaScreen> {
 
   @override
   Widget build(BuildContext context) {
-    viewModel = context.watch();
-    //QuestionModel q = questions[currentQuestion];
+    final viewModel = context.watch<TriviaViewModel>();
 
-    if (viewModel!.status == TriviaS.loading) {
-      return Scaffold(
-        body: const Center(child: CircularProgressIndicator()),
-      );
-    }
-    if (viewModel!.status == TriviaS.error) {
-      return Scaffold(
-        body: const Center(child: Text('Error al cargar la pregunta')),
-      );
-    }
-
-    final q = viewModel!.questionModel!;
-    
-    return PopScope(
-      canPop: false,
-
-      child: Scaffold(
-        backgroundColor: Color.fromRGBO(146, 122, 255, 1),
-        appBar: AppBar(
-          backgroundColor: Color.fromRGBO(146, 122, 255, 1),
-          leading: IconButton(
-            icon: const Icon(
-              Icons.arrow_back,
-              color: Colors.white,
-            ),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
+    return Scaffold(
+      backgroundColor: const Color.fromRGBO(146, 122, 255, 1),
+      appBar: AppBar(
+        backgroundColor: const Color.fromRGBO(146, 122, 255, 1),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
         ),
-        body: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                'Pregunta ${viewModel!.currentQuestion + 1} de ${viewModel!.questionIds.length}',
-                style: const TextStyle(
-                  fontSize: 20,
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 20),
-              Text(
-                q.question,
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-              const SizedBox(height: 30),
-              ...List.generate(q.options.length, (index) {
-                Color color = Colors.white;
-                if (answered) {
-                  if (index == q.correctIndex) {
-                    color = Colors.green;
-                  } else if (index == selectedAnswer) {
-                    color = Colors.red;
-                  }
-                }
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 6.0),
-                  child: ElevatedButton(
-                    onPressed: () => _selectAnswer(index),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: color,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                    ),
-                    child: Text(q.options[index], style: const TextStyle(fontSize: 18, color: Colors.black)),
-                  ),
-                );
-              }),
-              const SizedBox(height: 30),
-              Text('Puntaje de la partida: $score',
-                  style: const TextStyle(
-                    fontSize: 22,
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  )),
-              const SizedBox(height: 10),
-              // Text('Mejor Puntaje Trivia: $highestTriviaScore',
-              //     style: const TextStyle(fontSize: 20, color: Colors.black54)),
-            ],
+        title: Text('Nivel ${viewModel.currentLevel}', style: const TextStyle(color: Colors.white)),
+      ),
+      body: _buildBody(viewModel),
+    );
+  }
+
+  Widget _buildBody(TriviaViewModel viewModel) {
+    switch (viewModel.state) {
+      case TriviaState.loading:
+        return const Center(child: CircularProgressIndicator(color: Colors.white));
+      case TriviaState.error:
+        return const Center(child: Text('Error al cargar las preguntas.', style: TextStyle(color: Colors.white)));
+      case TriviaState.empty:
+        return const Center(child: Text('No hay preguntas para este nivel.', style: TextStyle(color: Colors.white)));
+      case TriviaState.content:
+      case TriviaState.levelUp:
+      case TriviaState.repeatLevel:
+      case TriviaState.gameFinished:
+        return _buildContent(viewModel);
+      default:
+        return const Center(child: Text('Estado desconocido.', style: TextStyle(color: Colors.white)));
+    }
+  }
+
+  Widget _buildContent(TriviaViewModel viewModel) {
+    if (viewModel.questionModel == null) {
+      return const Center(child: CircularProgressIndicator(color: Colors.white));
+    }
+    final q = viewModel.questionModel!;
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            'Pregunta ${viewModel.currentQuestionNumber} de ${viewModel.totalLevelQuestions}',
+            style: const TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
+            textAlign: TextAlign.center,
           ),
-        ),
+          const SizedBox(height: 20),
+          Text(
+            q.question,
+            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 30),
+          ...List.generate(q.options.length, (index) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 6.0),
+              child: ElevatedButton(
+                onPressed: () => _selectAnswer(index),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                ),
+                child: Text(q.options[index], style: const TextStyle(fontSize: 18, color: Colors.black)),
+              ),
+            );
+          }),
+        ],
       ),
     );
   }
