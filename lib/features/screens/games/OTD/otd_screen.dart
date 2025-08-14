@@ -1,5 +1,7 @@
 // ignore_for_file: library_private_types_in_public_api
 
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -55,11 +57,10 @@ class _OneTouchGameState extends State<OneTouchGame> {
 
       final nodePosition = nodes[i].position + puzzleOffset;
       if ((nodePosition - position).distance < 25) {
-        final lineIndex = lines.indexWhere(
-          (line) =>
-              ((line.startNodeIndex == currentNode && line.endNodeIndex == i) ||
-               (line.endNodeIndex == currentNode && line.startNodeIndex == i)) &&
-              !line.isDrawn,
+        final lineIndex = lines.indexWhere((line) =>
+          ((line.startNodeIndex == currentNode && line.endNodeIndex == i) ||
+          (line.endNodeIndex == currentNode && line.startNodeIndex == i)) &&
+          !line.isDrawn,
         );
 
         if (lineIndex != -1) {
