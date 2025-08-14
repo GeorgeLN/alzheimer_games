@@ -16,7 +16,7 @@ class QuestionRepository {
     return firestoreService.loadQuestion(gameId: questionId);
   }
 
-  Future<List<String>> loadListQuestions() async {
-    return firestoreService.loadListQuestions();
+  Future<List<String>> loadListQuestions({required int level}) async {
+    return firestoreService.loadListQuestions(level: level);
   }
 }

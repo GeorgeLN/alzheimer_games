@@ -1,136 +1,136 @@
-
 import 'package:alzheimer_games_app/data/models/models.dart';
 import 'package:alzheimer_games_app/data/repositories/question_repository.dart';
-import 'package:alzheimer_games_app/data/repositories/user_repository.dart'; // Added UserRepository import
+import 'package:alzheimer_games_app/data/repositories/user_repository.dart';
 import 'package:alzheimer_games_app/data/services/authentication/auth_service.dart';
 import 'package:alzheimer_games_app/data/services/firestore/firestore_service.dart';
-// import 'package:cloud_firestore/cloud_firestore.dart';
-// import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-enum TriviaS{
-  content,
+enum TriviaState {
   loading,
   error,
   empty,
+  content,
+  levelUp,
+  repeatLevel,
+  gameFinished,
 }
 
 class TriviaViewModel with ChangeNotifier {
-  var status = TriviaS.loading;
   final QuestionRepository questionRepository;
-  final UserRepository userRepository; // Added UserRepository field
-  QuestionModel? questionModel;
-  PlayerModel? playerModel;
-  final List<String> questionIds = [];
-
-  int currentQuestion = 0;
-
-  TriviaViewModel({
-    required this.questionRepository,
-    required this.firestoreService,
-    required this.authService,
-    required this.userRepository, // Added to constructor
-  });
-  
+  final UserRepository userRepository;
   final FirestoreService firestoreService;
   final AuthService authService;
 
-  Future<void> saveGameScore(int newScore) async {
-    try {
-      PlayerModel currentPlayer = await userRepository.getCurrentPlayer();
-      int currentTriviaScore = currentPlayer.scoreTrivia ?? 0;
+  TriviaState _state = TriviaState.loading;
+  TriviaState get state => _state;
 
-      if (newScore > currentTriviaScore) {
-        await userRepository.updateUser(
-          scoreTrivia: newScore,
-          scoreMemory: currentPlayer.scoreMemory,
-          scorePattern: currentPlayer.scorePattern,
-          scorePuzzle: currentPlayer.scorePuzzle,
-        );
-        playerModel?.scoreTrivia = newScore; // Update local model
-        notifyListeners(); // Notify UI of change
-        print('Puntaje de Trivia actualizado y guardado: $newScore');
-      } else {
-        print('Puntaje de Trivia no guardado, el nuevo puntaje ($newScore) no es mayor que el actual ($currentTriviaScore).');
-      }
-    } catch (e) {
-      print('Error al guardar puntaje de Trivia: $e');
-    }
-  }
+  QuestionModel? questionModel;
+  PlayerModel? playerModel;
+  List<String> _questionIds = [];
+
+  int _currentQuestionIndex = 0;
+  int get currentQuestionNumber => _currentQuestionIndex + 1;
+  int get totalLevelQuestions => _questionIds.length;
+
+  int _currentLevel = 1;
+  int get currentLevel => _currentLevel;
+
+  int _correctAnswers = 0;
+
+  TriviaViewModel({
+    required this.questionRepository,
+    required this.userRepository,
+    required this.firestoreService,
+    required this.authService,
+  });
 
   void initialize() async {
+    _setState(TriviaState.loading);
     try {
-      await loadListQuestions();
       final userId = await authService.getUserId();
-      firestoreService.loadPlayerStream(userId: userId ?? '').listen((event) {
-        playerModel = event;
-        notifyListeners();
-      });
+      if (userId != null) {
+        firestoreService.loadPlayerStream(userId: userId).listen((player) {
+          playerModel = player;
+          notifyListeners();
+        });
+      }
+      await _loadQuestionsForCurrentLevel();
+    } catch (e) {
+      _setState(TriviaState.error);
+    }
+  }
 
-      if (questionIds.isNotEmpty) {
-        //Aquí se valida el nivel de las preguntas
-        await loadQuestion(questionId: questionIds.first);
+  Future<void> _loadQuestionsForCurrentLevel() async {
+    try {
+      _questionIds = await questionRepository.loadListQuestions(level: _currentLevel);
+      if (_questionIds.isNotEmpty) {
+        _questionIds.shuffle();
+        _questionIds = _questionIds.take(7).toList();
+        _currentQuestionIndex = 0;
+        _correctAnswers = 0;
+        await _loadQuestion();
       } else {
-        emitEmpty();
+        _setState(TriviaState.empty);
       }
     } catch (e) {
-      emitError();
+      _setState(TriviaState.error);
     }
   }
 
-  void resetQuestion() {
-    currentQuestion = 0;
-    loadQuestion(questionId: questionIds[currentQuestion]);
-  }
-
-  void nextQuestion() async {
-    if (currentQuestion < questionIds.length - 1) {
-      currentQuestion ++;
-      await loadQuestion(questionId: questionIds[currentQuestion]);
-    }
-  }
-
-  Future<void> loadListQuestions() async {
+  Future<void> _loadQuestion() async {
     try {
-      emitLoading();
-      questionIds.addAll(await questionRepository.loadListQuestions());
-      emitContent();
-    } catch (e) {
-      emitError();
-    }
-  }
-
-  Future<void> loadQuestion({required String questionId}) async {    
-    try {
-      emitLoading();
+      _setState(TriviaState.loading);
       await Future.delayed(const Duration(seconds: 1));
       questionModel = await questionRepository.loadQuestion(
-        questionId: questionId,
+        questionId: _questionIds[_currentQuestionIndex],
       );
-      emitContent();
+      _setState(TriviaState.content);
     } catch (e) {
-      emitError();
+      _setState(TriviaState.error);
     }
   }
 
-  void emitError() {
-    status = TriviaS.error;
-    notifyListeners();
+  void checkAnswer(int selectedOptionIndex) {
+    if (selectedOptionIndex == questionModel!.correctIndex) {
+      _correctAnswers++;
+    }
+
+    if (_currentQuestionIndex < _questionIds.length - 1) {
+      _currentQuestionIndex++;
+      _loadQuestion();
+    } else {
+      _levelEnd();
+    }
   }
 
-  void emitLoading() {
-    status = TriviaS.loading;
-    notifyListeners();
+  void _levelEnd() {
+    if (_correctAnswers == _questionIds.length) {
+      if (_currentLevel < 3) {
+        _currentLevel++;
+        _setState(TriviaState.levelUp);
+      } else {
+        _setState(TriviaState.gameFinished);
+      }
+    } else {
+      _setState(TriviaState.repeatLevel);
+    }
   }
 
-  void emitContent() {
-    status = TriviaS.content;
-    notifyListeners();
+  void nextLevel() {
+    _loadQuestionsForCurrentLevel();
   }
 
-  void emitEmpty() {
-    status = TriviaS.empty;
+  void repeatLevel() {
+    _loadQuestionsForCurrentLevel();
+  }
+
+  void restartGame() {
+    _currentLevel = 1;
+    _loadQuestionsForCurrentLevel();
+  }
+
+  void _setState(TriviaState newState) {
+    _state = newState;
     notifyListeners();
   }
 }
-

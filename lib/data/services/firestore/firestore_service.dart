@@ -89,8 +89,8 @@ class FirestoreService {
     return result.data()!;
   }
 
-  Future<List<String>> loadListQuestions() async {
-    final result = await firestore.collection('trivia_questions').get();
+  Future<List<String>> loadListQuestions({required int level}) async {
+    final result = await firestore.collection('trivia_questions').where('level', isEqualTo: level).get();
     return result.docs.map((doc) => doc.id).toList();
   }
 }
