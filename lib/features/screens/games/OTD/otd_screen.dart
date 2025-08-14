@@ -152,6 +152,12 @@ class _OneTouchGameState extends State<OneTouchGame> {
           return GestureDetector(
             onPanStart: (details) => _onPanStart(details.localPosition, puzzleOffset),
             onPanUpdate: (details) => _onPanUpdate(details.localPosition, puzzleOffset),
+            onPanEnd: (_) {
+              // Si el dedo se levanta antes de completar el nivel, reiniciarlo
+              if (!isLevelComplete) {
+                _loadLevel(currentLevelIndex);
+              }
+            },
             child: Container(
               color: Colors.deepPurple.shade50,
               child: CustomPaint(
