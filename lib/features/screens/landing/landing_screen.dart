@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:iconly/iconly.dart';
 
 import '../../bloc/bottom_nav_cubit.dart';
 import '../screens.dart';
@@ -73,18 +72,18 @@ class _LandingScreenState extends State<LandingScreen> {
               children: [
                 _bottomAppBarItem(
                   context,
-                  defaultIcon: IconlyLight.game,
+                  defaultIcon: Icons.videogame_asset_outlined,
                   page: 0,
                   label: "Juegos",
-                  filledIcon: IconlyBold.game,
+                  filledIcon: Icons.videogame_asset,
                 ),
             
                 _bottomAppBarItem(
                   context,
-                  defaultIcon: IconlyLight.profile,
+                  defaultIcon: Icons.person_outlined,
                   page: 1,
                   label: "Perfil",
-                  filledIcon: IconlyBold.profile,
+                  filledIcon: Icons.person,
                 ),
               ],
             ),

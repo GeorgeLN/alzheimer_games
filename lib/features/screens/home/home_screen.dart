@@ -14,8 +14,6 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   late final UserRepository _userRepository;
   PlayerModel? _player;
-  bool _isLoading = true;
-  String? _errorMessage;
 
   @override
   void initState() {
@@ -29,12 +27,9 @@ class _HomeScreenState extends State<HomeScreen> {
       final player = await _userRepository.getCurrentPlayer();
       setState(() {
         _player = player;
-        _isLoading = false;
       });
     } catch (e) {
       setState(() {
-        _errorMessage = 'Error al cargar los datos del usuario: $e';
-        _isLoading = false;
       });
     }
   }

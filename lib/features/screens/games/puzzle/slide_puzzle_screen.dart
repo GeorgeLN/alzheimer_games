@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:collection/collection.dart'; // For ListEquality
+import 'package:collection/collection.dart';
 import 'package:get_it/get_it.dart'; // Import GetIt
 import './puzzle_view_model.dart'; // Import ViewModel
 

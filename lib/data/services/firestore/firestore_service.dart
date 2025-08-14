@@ -21,7 +21,7 @@ class FirestoreService {
       String? email,
     }) async {
     await _userRef.doc(userId!).set(
-      PlayerModel.initial(userId: userId!, userName: name!),
+      PlayerModel.initial(userId: userId, userName: name!),
     );
   }
 
