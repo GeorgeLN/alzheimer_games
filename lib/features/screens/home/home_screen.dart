@@ -41,6 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
       {'nombre': 'Rompecabezas deslizante', 'route': '/puzzle'},
       {'nombre': 'Trivia', 'route': '/trivia'},
       {'nombre': 'Encaje de Figuras', 'route': '/encaje_figura'},
+      {'nombre': 'One Touch Drawing', 'route': '/otd'},
     ];
 
     String firstName = _player?.userName ?? '';
