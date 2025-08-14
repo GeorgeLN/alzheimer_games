@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart'; // Import GetIt
+import 'package:google_fonts/google_fonts.dart';
 import './pattern_view_model.dart'; // Import ViewModel
 
 class FiguraEncajeScreen extends StatefulWidget {
@@ -109,7 +110,14 @@ class _FiguraEncajeScreenState extends State<FiguraEncajeScreen> {
 
         appBar: AppBar(
           backgroundColor: Color.fromRGBO(146, 122, 255, 1),
-          title: const Text('Encaje de Figuras', style: TextStyle(color: Colors.black)),
+          title: Text(
+            'Encaje de Figuras',
+            style: GoogleFonts.poppins(
+              color: Colors.black,
+              fontSize: 20,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
           centerTitle: true,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back, color: Colors.black),
@@ -119,7 +127,7 @@ class _FiguraEncajeScreenState extends State<FiguraEncajeScreen> {
           ),
           actions: [
             IconButton(
-              icon: const Icon(Icons.refresh),
+              icon: const Icon(Icons.refresh, color: Colors.black),
               tooltip: 'Reiniciar juego',
               onPressed: () {
                 _initializeGameScreen(reinicio: true);

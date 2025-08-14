@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:collection/collection.dart';
 import 'package:get_it/get_it.dart'; // Import GetIt
+import 'package:google_fonts/google_fonts.dart';
 import './puzzle_view_model.dart'; // Import ViewModel
 
 class SlidePuzzleScreen extends StatefulWidget {
@@ -140,7 +141,14 @@ class _SlidePuzzleScreenState extends State<SlidePuzzleScreen> {
 
         appBar: AppBar(
           backgroundColor: const Color.fromRGBO(146, 122, 255, 1),
-          title: const Text('Puzzle de Números', style: TextStyle(color: Colors.black)),
+          title: Text(
+            'Puzzle de Números',
+            style: GoogleFonts.poppins(
+              color: Colors.black,
+              fontSize: 20,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
           leading: IconButton(
             icon: const Icon(Icons.arrow_back, color: Colors.black),
             onPressed: () {
@@ -167,7 +175,7 @@ class _SlidePuzzleScreenState extends State<SlidePuzzleScreen> {
               },
             ),
             IconButton(
-              icon: const Icon(Icons.refresh, color: Colors.white),
+              icon: const Icon(Icons.refresh, color: Colors.black),
               tooltip: 'Reiniciar nivel',
               onPressed: _initializePuzzle,
             ),

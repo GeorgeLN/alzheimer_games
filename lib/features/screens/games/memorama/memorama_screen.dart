@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
 import 'package:get_it/get_it.dart'; // Import GetIt
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../data/models/game_model/memorama_card_model.dart';
 import './memorama_view_model.dart'; // Import ViewModel
@@ -121,7 +122,14 @@ class _MemoramaScreenState extends State<MemoramaScreen> with TickerProviderStat
 
         appBar: AppBar(
           backgroundColor: Color.fromRGBO(146, 122, 255, 1),
-          title: const Text('Memorama', style: TextStyle(color: Colors.black)),
+          title: Text(
+            'Memorama',
+            style: GoogleFonts.poppins(
+              color: Colors.black,
+              fontSize: 20,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
           centerTitle: true,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back, color: Colors.black),
@@ -149,7 +157,7 @@ class _MemoramaScreenState extends State<MemoramaScreen> with TickerProviderStat
               },
             ),
             IconButton(
-              icon: const Icon(Icons.refresh),
+              icon: const Icon(Icons.refresh, color: Colors.black),
               tooltip: 'Reiniciar nivel',
               onPressed: () => _generateCards(), // Reinicia el juego, score se reinicia a 0 por defecto
             ),

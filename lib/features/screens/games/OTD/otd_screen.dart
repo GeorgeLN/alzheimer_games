@@ -4,6 +4,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../data/models/game_model/otd_model.dart';
 import 'otd_levels.dart';
@@ -134,11 +135,19 @@ class _OneTouchGameState extends State<OneTouchGame> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('One Touch Drawing - Nivel ${currentLevelIndex + 1}'),
         backgroundColor: Colors.deepPurple,
+        title: Text(
+          'OTD - Nivel ${currentLevelIndex + 1}',
+          style: GoogleFonts.poppins(
+            color: Colors.black,
+            fontSize: 20,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh),
+            icon: const Icon(Icons.refresh, color: Colors.black),
             tooltip: 'Reiniciar Nivel',
             onPressed: () => _loadLevel(currentLevelIndex),
           ),
