@@ -2,9 +2,12 @@
 
 import 'dart:math';
 
+import 'package:alzheimer_games_app/data/models/user_model/user_model.dart';
+import 'package:alzheimer_games_app/data/repositories/user_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 import '../../../../data/models/game_model/otd_model.dart';
 import 'otd_levels.dart';
@@ -21,12 +24,23 @@ class _OneTouchGameState extends State<OneTouchGame> {
   late List<Line> lines;
   int? currentNode;
   int currentLevelIndex = 0;
+  PlayerModel? currentPlayer;
+  int get scoreOtd => currentPlayer?.scoreOtd ?? 0;
   bool get isLevelComplete => lines.every((line) => line.isDrawn);
 
   @override
   void initState() {
     super.initState();
     _loadLevel(currentLevelIndex);
+    _loadCurrentUser();
+  }
+
+  Future<void> _loadCurrentUser() async {
+    final userRepository = Provider.of<UserRepository>(context, listen: false);
+    final user = await userRepository.getCurrentPlayer();
+    setState(() {
+      currentPlayer = user;
+    });
   }
 
   void _loadLevel(int levelIndex) {
@@ -80,6 +94,21 @@ class _OneTouchGameState extends State<OneTouchGame> {
   }
 
   void _showLevelCompleteDialog() {
+    if (currentPlayer == null) return;
+    final userRepository = Provider.of<UserRepository>(context, listen: false);
+    userRepository.updateUser(scoreOtd: scoreOtd + 10);
+    setState(() {
+      currentPlayer = PlayerModel(
+        userId: currentPlayer!.userId,
+        userName: currentPlayer!.userName,
+        scoreMemory: currentPlayer!.scoreMemory,
+        scorePuzzle: currentPlayer!.scorePuzzle,
+        scoreTrivia: currentPlayer!.scoreTrivia,
+        scorePattern: currentPlayer!.scorePattern,
+        scoreOtd: scoreOtd + 10,
+      );
+    });
+
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -122,6 +151,17 @@ class _OneTouchGameState extends State<OneTouchGame> {
             color: Colors.black,
             fontSize: 20,
             fontWeight: FontWeight.w500,
+          ),
+        ),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(30.0),
+          child: Text(
+            'Puntuación: $scoreOtd',
+            style: GoogleFonts.poppins(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ),
         centerTitle: true,
