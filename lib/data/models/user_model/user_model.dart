@@ -4,6 +4,7 @@ class PlayerModel {
     this.scorePuzzle,
     this.scoreTrivia,
     this.scorePattern,
+    this.scoreOtd,
     this.userName,
     this.userId,
   });
@@ -14,6 +15,7 @@ class PlayerModel {
       scorePuzzle: json['score_puzzle'] as int?,
       scoreTrivia: json['score_trivia'] as int?,
       scorePattern: json['score_pattern'] as int?,
+      scoreOtd: json['score_otd'] as int?,
       userName: json['user_name'] as String?,
       userId: json['userId'] as String?,
     );
@@ -22,6 +24,7 @@ class PlayerModel {
   final int? scorePuzzle;
   late final int? scoreTrivia;
   final int? scorePattern;
+  final int? scoreOtd;
   final String? userName;
   final String? userId;
 
@@ -32,6 +35,7 @@ class PlayerModel {
       scorePuzzle: 0,
       scoreTrivia: 0,
       scorePattern: 0,
+      scoreOtd: 0,
       userName: userName,
       userId: userId,
     );
@@ -43,6 +47,7 @@ class PlayerModel {
       'score_puzzle': scorePuzzle,
       'score_trivia': scoreTrivia,
       'score_pattern': scorePattern,
+      'score_otd': scoreOtd,
       'user_name': userName,
       'userId': userId,
     };

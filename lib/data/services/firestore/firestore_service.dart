@@ -48,6 +48,7 @@ class FirestoreService {
     int? scoreTrivia,
     int? scorePuzzle,
     int? scorePattern,
+    int? scoreOtd,
   }) async {
     final Map<String, Object?> scoresToUpdate = {};
     if (scoreMemory != null) {
@@ -61,6 +62,9 @@ class FirestoreService {
     }
     if (scorePattern != null) {
       scoresToUpdate['score_pattern'] = scorePattern;
+    }
+    if (scoreOtd != null) {
+      scoresToUpdate['score_otd'] = scoreOtd;
     }
 
     if (scoresToUpdate.isNotEmpty) {

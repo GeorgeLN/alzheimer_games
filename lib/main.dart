@@ -24,8 +24,18 @@ void main() async {
   );
   await setupInjection();
   runApp(
-    MultiBlocProvider(
+    MultiProvider(
       providers: [
+        Provider<AuthService>(
+          create: (_) => AuthService(FirebaseAuth.instance),
+        ),
+        Provider<FirestoreService>(
+          create: (_) => FirestoreService(FirebaseFirestore.instance),
+        ),
+        ProxyProvider2<AuthService, FirestoreService, UserRepository>(
+          update: (_, authService, firestoreService, __) =>
+              UserRepository(authService: authService, firestoreService: firestoreService),
+        ),
         BlocProvider<BottomNavCubit>(
           create: (context) => BottomNavCubit(),
         ),
@@ -37,7 +47,7 @@ void main() async {
         ),
       ],
       child: const MyApp(),
-    )
+    ),
   );
 }
 
@@ -63,10 +73,10 @@ class MyApp extends StatelessWidget {
           '/memorama': (context) => const MemoramaScreen(),
           '/trivia': (context) => ChangeNotifierProvider(
             create: (context) => TriviaViewModel(
-              userRepository: UserRepository(authService: AuthService(FirebaseAuth.instance), firestoreService: FirestoreService(FirebaseFirestore.instance)),
-              questionRepository: QuestionRepository(firestoreService: FirestoreService(FirebaseFirestore.instance)),
-              firestoreService: FirestoreService(FirebaseFirestore.instance),
-              authService: AuthService(FirebaseAuth.instance),
+              userRepository: context.read<UserRepository>(),
+              questionRepository: QuestionRepository(firestoreService: context.read<FirestoreService>()),
+              firestoreService: context.read<FirestoreService>(),
+              authService: context.read<AuthService>(),
             ),
             child: const TriviaScreen(),
           ),
