@@ -40,6 +40,7 @@ class UserRepository {
     int? scorePuzzle,
     int? scorePattern,
     int? scoreOtd,
+    Map<String, List<int>>? completedLevels,
   }) async {
     final userId = await authService.getUserId();
     await firestoreService.updateUser(
@@ -49,6 +50,7 @@ class UserRepository {
       scorePuzzle: scorePuzzle,
       scorePattern: scorePattern,
       scoreOtd: scoreOtd,
+      completedLevels: completedLevels,
     );
   }
 
