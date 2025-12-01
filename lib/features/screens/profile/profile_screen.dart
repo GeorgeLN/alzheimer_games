@@ -122,6 +122,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         _buildScoreRow('Puzzle', _player!.scorePuzzle),
                                         _buildScoreRow('Trivia', _player!.scoreTrivia),
                                         _buildScoreRow('Encaje de Figuras', _player!.scorePattern),
+                                        _buildScoreRow('One touch drawing', _player!.scoreOtd),
                                       ],
                                     ),
                                   ),
