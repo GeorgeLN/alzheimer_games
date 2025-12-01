@@ -10,10 +10,12 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../data/models/game_model/otd_model.dart';
+import 'otd_level_selection_screen.dart';
 import 'otd_levels.dart';
 
 class OneTouchGame extends StatefulWidget {
-  const OneTouchGame({super.key});
+  final int level;
+  const OneTouchGame({super.key, this.level = 0});
 
   @override
   _OneTouchGameState createState() => _OneTouchGameState();
@@ -23,7 +25,7 @@ class _OneTouchGameState extends State<OneTouchGame> {
   late List<Node> nodes;
   late List<Line> lines;
   int? currentNode;
-  int currentLevelIndex = 0;
+  late int currentLevelIndex;
   PlayerModel? currentPlayer;
   int get scoreOtd => currentPlayer?.scoreOtd ?? 0;
   bool get isLevelComplete => lines.every((line) => line.isDrawn);
@@ -31,6 +33,7 @@ class _OneTouchGameState extends State<OneTouchGame> {
   @override
   void initState() {
     super.initState();
+    currentLevelIndex = widget.level;
     _loadLevel(currentLevelIndex);
     _loadCurrentUser();
   }
@@ -96,7 +99,19 @@ class _OneTouchGameState extends State<OneTouchGame> {
   void _showLevelCompleteDialog() {
     if (currentPlayer == null) return;
     final userRepository = Provider.of<UserRepository>(context, listen: false);
-    userRepository.updateUser(scoreOtd: scoreOtd + 10);
+    final newScore = scoreOtd + 10;
+    final updatedLevels = Map<String, List<int>>.from(currentPlayer!.completedLevels ?? {});
+    final otdLevels = updatedLevels['otd'] ?? [];
+    if (!otdLevels.contains(currentLevelIndex)) {
+      otdLevels.add(currentLevelIndex);
+      updatedLevels['otd'] = otdLevels;
+    }
+
+    userRepository.updateUser(
+      scoreOtd: newScore,
+      completedLevels: updatedLevels,
+    );
+
     setState(() {
       currentPlayer = PlayerModel(
         userId: currentPlayer!.userId,
@@ -105,7 +120,8 @@ class _OneTouchGameState extends State<OneTouchGame> {
         scorePuzzle: currentPlayer!.scorePuzzle,
         scoreTrivia: currentPlayer!.scoreTrivia,
         scorePattern: currentPlayer!.scorePattern,
-        scoreOtd: scoreOtd + 10,
+        scoreOtd: newScore,
+        completedLevels: updatedLevels,
       );
     });
 
@@ -167,6 +183,18 @@ class _OneTouchGameState extends State<OneTouchGame> {
         centerTitle: true,
         actions: [
           IconButton(
+            icon: const Icon(Icons.list, color: Colors.black),
+            tooltip: 'Seleccionar Nivel',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const OtdLevelSelectionScreen(),
+                ),
+              );
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.refresh, color: Colors.black),
             tooltip: 'Reiniciar Nivel',
             onPressed: () => _loadLevel(currentLevelIndex),
@@ -210,7 +238,29 @@ class _OneTouchGameState extends State<OneTouchGame> {
             onPanUpdate: (details) => _onPanUpdate(details.localPosition, puzzleOffset, scale),
             onPanEnd: (_) {
               if (!isLevelComplete) {
-                _loadLevel(currentLevelIndex);
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (context) => AlertDialog(
+                    title: const Text('¡Has fallado!'),
+                    content: const Text('¿Quieres intentar de nuevo?'),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          _loadLevel(currentLevelIndex);
+                        },
+                        child: const Text('Reiniciar'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text('Cancelar'),
+                      ),
+                    ],
+                  ),
+                );
               }
             },
             child: Container(

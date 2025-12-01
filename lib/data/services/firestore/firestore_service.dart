@@ -49,28 +49,32 @@ class FirestoreService {
     int? scorePuzzle,
     int? scorePattern,
     int? scoreOtd,
+    Map<String, List<int>>? completedLevels,
   }) async {
-    final Map<String, Object?> scoresToUpdate = {};
+    final Map<String, Object?> dataToUpdate = {};
     if (scoreMemory != null) {
-      scoresToUpdate['score_memory'] = scoreMemory;
+      dataToUpdate['score_memory'] = scoreMemory;
     }
     if (scoreTrivia != null) {
-      scoresToUpdate['score_trivia'] = scoreTrivia;
+      dataToUpdate['score_trivia'] = scoreTrivia;
     }
     if (scorePuzzle != null) {
-      scoresToUpdate['score_puzzle'] = scorePuzzle;
+      dataToUpdate['score_puzzle'] = scorePuzzle;
     }
     if (scorePattern != null) {
-      scoresToUpdate['score_pattern'] = scorePattern;
+      dataToUpdate['score_pattern'] = scorePattern;
     }
     if (scoreOtd != null) {
-      scoresToUpdate['score_otd'] = scoreOtd;
+      dataToUpdate['score_otd'] = scoreOtd;
+    }
+    if (completedLevels != null) {
+      dataToUpdate['completed_levels'] = completedLevels;
     }
 
-    if (scoresToUpdate.isNotEmpty) {
+    if (dataToUpdate.isNotEmpty) {
       // Ensure userId is not null or empty before attempting to update.
       if (userId != null && userId.isNotEmpty) {
-        await _userRef.doc(userId).update(scoresToUpdate);
+        await _userRef.doc(userId).update(dataToUpdate);
       } else {
         // Handle the case where userId is null or empty, perhaps log an error or throw an exception.
         print('Error: userId is null or empty in updateUser.');
