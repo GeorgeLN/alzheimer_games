@@ -150,9 +150,7 @@ class _TriviaScreenState extends State<TriviaScreen> {
       case TriviaState.repeatLevel:
       case TriviaState.gameFinished:
         return _buildContent(viewModel);
-      default:
-        return const Center(child: Text('Estado desconocido.', style: TextStyle(color: Colors.white)));
-    }
+      }
   }
 
   Widget _buildContent(TriviaViewModel viewModel) {
