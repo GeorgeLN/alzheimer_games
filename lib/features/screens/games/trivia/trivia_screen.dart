@@ -186,7 +186,7 @@ class _TriviaScreenState extends State<TriviaScreen> {
               child: ElevatedButton(
                 onPressed: () => _selectAnswer(index),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
+                  backgroundColor: _getAnswerColor(viewModel.answerStates[index]),
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
                 child: Text(q.options[index], style: const TextStyle(fontSize: 18, color: Colors.black)),
@@ -196,5 +196,17 @@ class _TriviaScreenState extends State<TriviaScreen> {
         ],
       ),
     );
+  }
+
+  Color _getAnswerColor(AnswerState state) {
+    switch (state) {
+      case AnswerState.correct:
+        return Colors.green;
+      case AnswerState.incorrect:
+        return Colors.red;
+      case AnswerState.neutral:
+      default:
+        return Colors.white;
+    }
   }
 }

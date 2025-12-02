@@ -15,6 +15,12 @@ enum TriviaState {
   gameFinished,
 }
 
+enum AnswerState {
+  neutral,
+  correct,
+  incorrect,
+}
+
 class TriviaViewModel with ChangeNotifier {
   final QuestionRepository questionRepository;
   final UserRepository userRepository;
@@ -27,6 +33,7 @@ class TriviaViewModel with ChangeNotifier {
   QuestionModel? questionModel;
   PlayerModel? playerModel;
   List<String> _questionIds = [];
+  List<AnswerState> answerStates = [];
 
   int _currentQuestionIndex = 0;
   int get currentQuestionNumber => _currentQuestionIndex + 1;
@@ -84,16 +91,24 @@ class TriviaViewModel with ChangeNotifier {
       questionModel = await questionRepository.loadQuestion(
         questionId: _questionIds[_currentQuestionIndex],
       );
-      _setState(TriviaState.content);
+      answerStates = List.generate(questionModel!.options.length, (_) => AnswerState.neutral);
+      _setState( TriviaState.content);
     } catch (e) {
       _setState(TriviaState.error);
     }
   }
 
-  void checkAnswer(int selectedOptionIndex) {
+  Future<void> checkAnswer(int selectedOptionIndex) async {
     if (selectedOptionIndex == questionModel!.correctIndex) {
       _correctAnswers++;
+      answerStates[selectedOptionIndex] = AnswerState.correct;
+    } else {
+      answerStates[selectedOptionIndex] = AnswerState.incorrect;
+      answerStates[questionModel!.correctIndex] = AnswerState.correct;
     }
+    notifyListeners();
+
+    await Future.delayed(const Duration(milliseconds: 500));
 
     if (_currentQuestionIndex < _questionIds.length - 1) {
       _currentQuestionIndex++;
