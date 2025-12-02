@@ -162,7 +162,7 @@ class _OneTouchGameState extends State<OneTouchGame> {
       canPop: false,
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.deepPurple,
+          backgroundColor: Color.fromRGBO(146, 122, 255, 1),
           centerTitle: true,
           title: Text(
             'OTD - Nivel ${currentLevelIndex + 1}',
@@ -186,7 +186,7 @@ class _OneTouchGameState extends State<OneTouchGame> {
           leading: IconButton(
             icon: const Icon(Icons.arrow_back, color: Colors.black),
             onPressed: () {
-              Navigator.pushReplacementNamed(context, '/home');
+              Navigator.pushReplacementNamed(context, '/landing');
             },
           ),
           actions: [
@@ -272,7 +272,7 @@ class _OneTouchGameState extends State<OneTouchGame> {
                 }
               },
               child: Container(
-                color: Colors.deepPurple.shade50,
+                color: Color.fromRGBO(146, 122, 255, 1),
                 child: CustomPaint(
                   size: Size.infinite,
                   painter: PuzzlePainter(nodes, lines, currentNode, puzzleOffset, scale),
@@ -307,7 +307,7 @@ class PuzzlePainter extends CustomPainter {
     for (var line in lines) {
       final p1 = nodes[line.startNodeIndex].position * scale + puzzleOffset;
       final p2 = nodes[line.endNodeIndex].position * scale + puzzleOffset;
-      linePaint.color = line.isDrawn ? Colors.greenAccent : Colors.grey.shade400;
+      linePaint.color = line.isDrawn ? Colors.greenAccent : Colors.grey.shade300;
       canvas.drawLine(p1, p2, linePaint);
     }
 
@@ -319,7 +319,7 @@ class PuzzlePainter extends CustomPainter {
         nodePaint.color = Colors.orangeAccent;
         canvas.drawCircle(position, 18, nodePaint);
       }
-      nodePaint.color = Colors.deepPurple;
+      nodePaint.color = Colors.greenAccent;
       canvas.drawCircle(position, 15, nodePaint);
     }
   }

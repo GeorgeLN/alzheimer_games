@@ -133,7 +133,7 @@ class _TriviaScreenState extends State<TriviaScreen> {
           leading: IconButton(
             icon: const Icon(Icons.arrow_back, color: Colors.black),
             onPressed: () {
-              Navigator.pushReplacementNamed(context, '/home');
+              Navigator.pushReplacementNamed(context, '/landing');
             },
           ),
         ),
@@ -205,8 +205,7 @@ class _TriviaScreenState extends State<TriviaScreen> {
       case AnswerState.incorrect:
         return Colors.red;
       case AnswerState.neutral:
-      default:
-        return Colors.white;
+      return Colors.white;
     }
   }
 }

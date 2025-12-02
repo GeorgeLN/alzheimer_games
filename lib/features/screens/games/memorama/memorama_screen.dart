@@ -81,7 +81,6 @@ class _MemoramaScreenState extends State<MemoramaScreen> with TickerProviderStat
         setState(() {
           cards[i1].isFlipped = false;
           cards[i2].isFlipped = false;
-          score = max(0, score - 2);
         });
       }
 
@@ -112,6 +111,8 @@ class _MemoramaScreenState extends State<MemoramaScreen> with TickerProviderStat
 
   @override
   Widget build(BuildContext context) {
+    var width = MediaQuery.of(context).size.width;
+
     return PopScope(
       canPop: false,
 
@@ -132,7 +133,7 @@ class _MemoramaScreenState extends State<MemoramaScreen> with TickerProviderStat
           leading: IconButton(
             icon: const Icon(Icons.arrow_back, color: Colors.black),
             onPressed: () {
-              Navigator.pushReplacementNamed(context, '/home');
+              Navigator.pushReplacementNamed(context, '/landing');
             },
           ),
           actions: [
@@ -165,7 +166,14 @@ class _MemoramaScreenState extends State<MemoramaScreen> with TickerProviderStat
           children: [
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Text('Puntaje: $score', style: const TextStyle(fontSize: 24, color: Colors.white, fontWeight: FontWeight.bold)),
+              child: Text(
+                'Puntaje: $score',
+                style: GoogleFonts.poppins(
+                  fontSize: width * 0.06,
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
             Expanded(
               child: GridView.builder(

@@ -79,7 +79,7 @@ class _OtdLevelSelectionScreenState extends State<OtdLevelSelectionScreen> {
                           : null,
                       child: Card(
                         color: isUnlocked
-                            ? (isCompleted ? Colors.deepPurple : Colors.white)
+                            ? (isCompleted ? Color.fromRGBO(146, 122, 255, 1) : Colors.white)
                             : Colors.grey,
                         child: Center(
                           child: Text(

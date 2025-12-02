@@ -75,62 +75,63 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         body: Center(
           child: _isLoading
-              ? const CircularProgressIndicator()
-              : _errorMessage != null
-                  ? Text(_errorMessage!, style: const TextStyle(color: Colors.red))
-                  : _player != null
-                      ? Padding(
-                          padding: const EdgeInsets.all(24.0),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(Icons.account_circle, size: size.width * 0.35, color: Colors.blueGrey),
-                              const SizedBox(height: 24),
-                              TextFormField(
-                                initialValue: _player?.userName ?? '',
-                                decoration: const InputDecoration(
-                                  labelText: 'Nombre de usuario',
-                                  border: OutlineInputBorder(),
-                                  prefixIcon: Icon(Icons.person),
+          ? const CircularProgressIndicator()
+          : _errorMessage != null
+            ? Text(_errorMessage!, style: const TextStyle(color: Colors.red))
+            : _player != null
+                ? Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.account_circle, size: size.width * 0.35, color: Colors.blueGrey),
+                      const SizedBox(height: 24),
+                      TextFormField(
+                        initialValue: _player?.userName ?? '',
+                        decoration: const InputDecoration(
+                          labelText: 'Nombre de usuario',
+                          border: OutlineInputBorder(),
+                          prefixIcon: Icon(Icons.person),
+                        ),
+                        readOnly: true,
+                      ),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        initialValue: FirebaseAuth.instance.currentUser?.email ?? '',
+                        decoration: const InputDecoration(
+                          labelText: 'Correo electrónico',
+                          border: OutlineInputBorder(),
+                          prefixIcon: Icon(Icons.email),
+                        ),
+                        readOnly: true,
+                      ),
+                      if (!_isLoading && _errorMessage == null && _player != null)
+                        Card(
+                          color: Colors.grey[200],
+                          margin: const EdgeInsets.only(top: 24.0),
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Puntuaciones',
+                                  style: Theme.of(context).textTheme.headlineSmall,
                                 ),
-                                readOnly: true,
-                              ),
-                              const SizedBox(height: 16),
-                              TextFormField(
-                                initialValue: FirebaseAuth.instance.currentUser?.email ?? '',
-                                decoration: const InputDecoration(
-                                  labelText: 'Correo electrónico',
-                                  border: OutlineInputBorder(),
-                                  prefixIcon: Icon(Icons.email),
-                                ),
-                                readOnly: true,
-                              ),
-                              if (!_isLoading && _errorMessage == null && _player != null)
-                                Card(
-                                  margin: const EdgeInsets.only(top: 24.0),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(16.0),
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          'Puntuaciones',
-                                          style: Theme.of(context).textTheme.headlineSmall,
-                                        ),
-                                        const SizedBox(height: 16),
-                                        _buildScoreRow('Memorama', _player!.scoreMemory),
-                                        _buildScoreRow('Puzzle', _player!.scorePuzzle),
-                                        _buildScoreRow('Trivia', _player!.scoreTrivia),
-                                        _buildScoreRow('Encaje de Figuras', _player!.scorePattern),
-                                        _buildScoreRow('One touch drawing', _player!.scoreOtd),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                            ],
+                                const SizedBox(height: 16),
+                                _buildScoreRow('Memorama', _player!.scoreMemory),
+                                _buildScoreRow('Puzzle', _player!.scorePuzzle),
+                                _buildScoreRow('Trivia', _player!.scoreTrivia),
+                                _buildScoreRow('Encaje de Figuras', _player!.scorePattern),
+                                _buildScoreRow('One touch drawing', _player!.scoreOtd),
+                              ],
+                            ),
                           ),
-                        )
-                      : const Text('No se encontraron datos del usuario.'),
+                        ),
+                    ],
+                  ),
+                )
+              : const Text('No se encontraron datos del usuario.'),
         ),
       ),
     );

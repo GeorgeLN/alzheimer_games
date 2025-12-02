@@ -86,7 +86,6 @@ class _FitPatternScreenState extends State<FitPatternScreen> {
           }
         }
       } else {
-        score = score > 0 ? score - 1 : 0;
         correctasConsecutivas = 0;
       }
     });
@@ -96,6 +95,8 @@ class _FitPatternScreenState extends State<FitPatternScreen> {
 
   @override
   Widget build(BuildContext context) {
+    var width = MediaQuery.of(context).size.width;
+
     if (figurasEnJuego.isEmpty) {
       // Handle the case where figures might not be initialized yet, though _initializeGameScreen should prevent this.
       return Scaffold(body: Center(child: CircularProgressIndicator()));
@@ -122,7 +123,7 @@ class _FitPatternScreenState extends State<FitPatternScreen> {
           leading: IconButton(
             icon: const Icon(Icons.arrow_back, color: Colors.black),
             onPressed: () {
-              Navigator.pushReplacementNamed(context, '/home');
+              Navigator.pushReplacementNamed(context, '/landing');
             },
           ),
           actions: [
@@ -138,10 +139,24 @@ class _FitPatternScreenState extends State<FitPatternScreen> {
         body: Column(
           //mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const SizedBox(height: 30),
-            Text('Puntaje: $score', style: const TextStyle(fontSize: 24, color: Colors.white, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 30),
-            const Text('Arrastra la figura correcta al contorno:', style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 15),
+            Text(
+              'Puntaje: $score',
+              style: GoogleFonts.poppins(
+                fontSize: width * 0.06,
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              'Arrastra la figura correcta al contorno:',
+              style: GoogleFonts.poppins(
+                fontSize: width * 0.04,
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
             const SizedBox(height: 20),
             Center(
               child: DragTarget<String>(
@@ -150,12 +165,12 @@ class _FitPatternScreenState extends State<FitPatternScreen> {
                   width: 200,
                   height: 200,
                   decoration: BoxDecoration(
-                    color: Colors.grey[700],
+                    color: Colors.amber,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: figuraObjetivo != null && figurasEnJuego.containsKey(figuraObjetivo)
-                      ? Icon(figurasEnJuego[figuraObjetivo], size: 100, color: Colors.white24)
-                      : const SizedBox(),
+                    ? Icon(figurasEnJuego[figuraObjetivo], size: 100, color: Colors.white)
+                    : const SizedBox(),
                 ),
               ),
             ),
@@ -166,7 +181,7 @@ class _FitPatternScreenState extends State<FitPatternScreen> {
               children: opciones.map((figuraNombre) {
                 return Draggable<String>(
                   data: figuraNombre,
-                  feedback: Icon(figurasEnJuego[figuraNombre], size: 100, color: Colors.amber),
+                  feedback: Icon(figurasEnJuego[figuraNombre], size: 100, color: Colors.black),
                   childWhenDragging: Opacity(
                     opacity: 0.3,
                     child: Icon(figurasEnJuego[figuraNombre], size: 100),

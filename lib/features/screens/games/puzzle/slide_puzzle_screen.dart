@@ -131,14 +131,12 @@ class _SlidePuzzleScreenState extends State<SlidePuzzleScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // double tileSize = MediaQuery.of(context).size.width / gridSize - 12;
+    var width = MediaQuery.of(context).size.width;
 
     return PopScope(
       canPop: false,
-
       child: Scaffold(
         backgroundColor: const Color.fromRGBO(146, 122, 255, 1),
-
         appBar: AppBar(
           backgroundColor: const Color.fromRGBO(146, 122, 255, 1),
           title: Text(
@@ -152,7 +150,7 @@ class _SlidePuzzleScreenState extends State<SlidePuzzleScreen> {
           leading: IconButton(
             icon: const Icon(Icons.arrow_back, color: Colors.black),
             onPressed: () {
-              Navigator.pushReplacementNamed(context, '/home');
+              Navigator.pushReplacementNamed(context, '/landing');
             },
           ),
           actions: [
@@ -189,7 +187,11 @@ class _SlidePuzzleScreenState extends State<SlidePuzzleScreen> {
                 isCompleted 
                     ? '¡Resuelto! Puntaje: $finalScore (Movimientos: $score)\nMejor Puntaje: $highestOrLastPuzzleScore' 
                     : 'Movimientos: $score\nMejor Puntaje: $highestOrLastPuzzleScore',
-                style: const TextStyle(fontSize: 24, color: Colors.white, fontWeight: FontWeight.bold),
+                style: GoogleFonts.poppins(
+                  fontSize: width * 0.055,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
                 textAlign: TextAlign.center,
               ),
             ),
