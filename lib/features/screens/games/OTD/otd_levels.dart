@@ -72,7 +72,6 @@ final List<Level> levels = [
       Line(1, 2),
       Line(2, 4),
       Line(4, 3),
-      Line(3, 1),
     ],
   ),
 
@@ -94,6 +93,7 @@ final List<Level> levels = [
       Line(0, 4),
       Line(1, 4),
       Line(4, 5),
+      Line(0, 5),
     ],
   ),
 
@@ -107,10 +107,10 @@ final List<Level> levels = [
       Node(const Offset(175, 125)), // 4
     ],
     lines: [
-      Line(0, 1),
+      Line(1, 0),
       Line(0, 2),
-      Line(1, 2),
-      Line(3, 4),
+      Line(2, 4),
+      Line(4, 3),
     ],
   ),
 
@@ -138,31 +138,29 @@ final List<Level> levels = [
     ],
   ),
 
-  // Level 8: Cube
+  // Level 8: Crystal
   Level(
     nodes: [
-      Node(const Offset(100, 100)), // 0
-      Node(const Offset(200, 100)), // 1
-      Node(const Offset(100, 200)), // 2
-      Node(const Offset(200, 200)), // 3
-      Node(const Offset(125, 75)), // 4
-      Node(const Offset(225, 75)), // 5
-      Node(const Offset(125, 175)), // 6
-      Node(const Offset(225, 175)), // 7
+      Node(const Offset(150, 50)), // 0
+      Node(const Offset(100, 100)), // 1
+      Node(const Offset(200, 100)), // 2
+      Node(const Offset(150, 125)), // 3
+      Node(const Offset(100, 150)), // 4
+      Node(const Offset(200, 150)), // 5
+      Node(const Offset(150, 200)), // 6
+      Node(const Offset(250, 200)), // 7
     ],
     lines: [
       Line(0, 1),
       Line(0, 2),
+      Line(1, 2),
       Line(1, 3),
       Line(2, 3),
-      Line(4, 5),
+      Line(1, 4),
+      Line(2, 5),
       Line(4, 6),
-      Line(5, 7),
+      Line(5, 6),
       Line(6, 7),
-      Line(0, 4),
-      Line(1, 5),
-      Line(2, 6),
-      Line(3, 7),
     ],
   ),
 
@@ -185,6 +183,7 @@ final List<Level> levels = [
       Line(2, 4),
       Line(3, 5),
       Line(4, 5),
+      Line(1, 2),
     ],
   ),
 
