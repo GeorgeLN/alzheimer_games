@@ -115,25 +115,28 @@ class _TriviaScreenState extends State<TriviaScreen> {
   Widget build(BuildContext context) {
     final viewModel = context.watch<TriviaViewModel>();
 
-    return Scaffold(
-      backgroundColor: const Color.fromRGBO(146, 122, 255, 1),
-      appBar: AppBar(
+    return PopScope(
+      canPop: false,
+      child: Scaffold(
         backgroundColor: const Color.fromRGBO(146, 122, 255, 1),
-        title: Text(
-          'Nivel ${viewModel.currentLevel}',
-          style: GoogleFonts.poppins(
-            color: Colors.black,
-            fontSize: 20,
-            fontWeight: FontWeight.w500,
+        appBar: AppBar(
+          backgroundColor: const Color.fromRGBO(146, 122, 255, 1),
+          title: Text(
+            'Nivel ${viewModel.currentLevel}',
+            style: GoogleFonts.poppins(
+              color: Colors.black,
+              fontSize: 20,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          centerTitle: true,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.black),
+            onPressed: () => Navigator.pop(context),
           ),
         ),
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
-        ),
+        body: _buildBody(viewModel),
       ),
-      body: _buildBody(viewModel),
     );
   }
 

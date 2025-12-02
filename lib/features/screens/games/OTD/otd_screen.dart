@@ -158,120 +158,123 @@ class _OneTouchGameState extends State<OneTouchGame> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.deepPurple,
-        title: Text(
-          'OTD - Nivel ${currentLevelIndex + 1}',
-          style: GoogleFonts.poppins(
-            color: Colors.black,
-            fontSize: 20,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(30.0),
-          child: Text(
-            'Puntuación: $scoreOtd',
+    return PopScope(
+      canPop: false,
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.deepPurple,
+          title: Text(
+            'OTD - Nivel ${currentLevelIndex + 1}',
             style: GoogleFonts.poppins(
-              color: Colors.white,
-              fontSize: 18,
+              color: Colors.black,
+              fontSize: 20,
               fontWeight: FontWeight.w500,
             ),
           ),
-        ),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.list, color: Colors.black),
-            tooltip: 'Seleccionar Nivel',
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const OtdLevelSelectionScreen(),
-                ),
-              );
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.refresh, color: Colors.black),
-            tooltip: 'Reiniciar Nivel',
-            onPressed: () => _loadLevel(currentLevelIndex),
-          ),
-        ],
-      ),
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          if (nodes.isEmpty) return Container(color: Colors.deepPurple.shade50);
-
-          double minX = double.infinity, minY = double.infinity;
-          double maxX = double.negativeInfinity, maxY = double.negativeInfinity;
-          for (var node in nodes) {
-            minX = min(minX, node.position.dx);
-            minY = min(minY, node.position.dy);
-            maxX = max(maxX, node.position.dx);
-            maxY = max(maxY, node.position.dy);
-          }
-
-          final puzzleWidth = maxX - minX;
-          final puzzleHeight = maxY - minY;
-
-          final availableWidth = constraints.maxWidth * 0.8; // 80% of width for padding
-          final availableHeight = constraints.maxHeight * 0.8; // 80% of height for padding
-
-          final scaleX = availableWidth / puzzleWidth;
-          final scaleY = availableHeight / puzzleHeight;
-          final scale = min(scaleX, scaleY);
-
-          final scaledPuzzleWidth = puzzleWidth * scale;
-          final scaledPuzzleHeight = puzzleHeight * scale;
-
-          final puzzleCenterX = minX * scale + scaledPuzzleWidth / 2;
-          final puzzleCenterY = minY * scale + scaledPuzzleHeight / 2;
-
-          final screenCenter = constraints.biggest.center(Offset.zero);
-          final puzzleOffset = Offset(screenCenter.dx - puzzleCenterX, screenCenter.dy - puzzleCenterY);
-
-          return GestureDetector(
-            onPanStart: (details) => _onPanStart(details.localPosition, puzzleOffset, scale),
-            onPanUpdate: (details) => _onPanUpdate(details.localPosition, puzzleOffset, scale),
-            onPanEnd: (_) {
-              if (!isLevelComplete) {
-                showDialog(
-                  context: context,
-                  barrierDismissible: false,
-                  builder: (context) => AlertDialog(
-                    title: const Text('¡Has fallado!'),
-                    content: const Text('¿Quieres intentar de nuevo?'),
-                    actions: [
-                      TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                          _loadLevel(currentLevelIndex);
-                        },
-                        child: const Text('Reiniciar'),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: const Text('Cancelar'),
-                      ),
-                    ],
-                  ),
-                );
-              }
-            },
-            child: Container(
-              color: Colors.deepPurple.shade50,
-              child: CustomPaint(
-                size: Size.infinite,
-                painter: PuzzlePainter(nodes, lines, currentNode, puzzleOffset, scale),
+          bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(30.0),
+            child: Text(
+              'Puntuación: $scoreOtd',
+              style: GoogleFonts.poppins(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
               ),
             ),
-          );
-        },
+          ),
+          centerTitle: true,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.list, color: Colors.black),
+              tooltip: 'Seleccionar Nivel',
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const OtdLevelSelectionScreen(),
+                  ),
+                );
+              },
+            ),
+            IconButton(
+              icon: const Icon(Icons.refresh, color: Colors.black),
+              tooltip: 'Reiniciar Nivel',
+              onPressed: () => _loadLevel(currentLevelIndex),
+            ),
+          ],
+        ),
+        body: LayoutBuilder(
+          builder: (context, constraints) {
+            if (nodes.isEmpty) return Container(color: Colors.deepPurple.shade50);
+      
+            double minX = double.infinity, minY = double.infinity;
+            double maxX = double.negativeInfinity, maxY = double.negativeInfinity;
+            for (var node in nodes) {
+              minX = min(minX, node.position.dx);
+              minY = min(minY, node.position.dy);
+              maxX = max(maxX, node.position.dx);
+              maxY = max(maxY, node.position.dy);
+            }
+      
+            final puzzleWidth = maxX - minX;
+            final puzzleHeight = maxY - minY;
+      
+            final availableWidth = constraints.maxWidth * 0.8; // 80% of width for padding
+            final availableHeight = constraints.maxHeight * 0.8; // 80% of height for padding
+      
+            final scaleX = availableWidth / puzzleWidth;
+            final scaleY = availableHeight / puzzleHeight;
+            final scale = min(scaleX, scaleY);
+      
+            final scaledPuzzleWidth = puzzleWidth * scale;
+            final scaledPuzzleHeight = puzzleHeight * scale;
+      
+            final puzzleCenterX = minX * scale + scaledPuzzleWidth / 2;
+            final puzzleCenterY = minY * scale + scaledPuzzleHeight / 2;
+      
+            final screenCenter = constraints.biggest.center(Offset.zero);
+            final puzzleOffset = Offset(screenCenter.dx - puzzleCenterX, screenCenter.dy - puzzleCenterY);
+      
+            return GestureDetector(
+              onPanStart: (details) => _onPanStart(details.localPosition, puzzleOffset, scale),
+              onPanUpdate: (details) => _onPanUpdate(details.localPosition, puzzleOffset, scale),
+              onPanEnd: (_) {
+                if (!isLevelComplete) {
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (context) => AlertDialog(
+                      title: const Text('¡Has fallado!'),
+                      content: const Text('¿Quieres intentar de nuevo?'),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                            _loadLevel(currentLevelIndex);
+                          },
+                          child: const Text('Reiniciar'),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: const Text('Cancelar'),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+              },
+              child: Container(
+                color: Colors.deepPurple.shade50,
+                child: CustomPaint(
+                  size: Size.infinite,
+                  painter: PuzzlePainter(nodes, lines, currentNode, puzzleOffset, scale),
+                ),
+              ),
+            );
+          },
+        ),
       ),
     );
   }

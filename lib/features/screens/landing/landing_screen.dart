@@ -133,6 +133,7 @@ class _LandingScreenState extends State<LandingScreen> {
     return PageView(
       onPageChanged: (int page) => onPageChanged(page),
       controller: pageController,
+      physics: const NeverScrollableScrollPhysics(),
       children: topLevelPages,
     );
   }
