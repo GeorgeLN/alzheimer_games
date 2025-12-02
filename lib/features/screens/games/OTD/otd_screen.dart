@@ -163,6 +163,7 @@ class _OneTouchGameState extends State<OneTouchGame> {
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.deepPurple,
+          centerTitle: true,
           title: Text(
             'OTD - Nivel ${currentLevelIndex + 1}',
             style: GoogleFonts.poppins(
@@ -182,13 +183,18 @@ class _OneTouchGameState extends State<OneTouchGame> {
               ),
             ),
           ),
-          centerTitle: true,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.black),
+            onPressed: () {
+              Navigator.pushReplacementNamed(context, '/home');
+            },
+          ),
           actions: [
             IconButton(
               icon: const Icon(Icons.list, color: Colors.black),
               tooltip: 'Seleccionar Nivel',
               onPressed: () {
-                Navigator.push(
+                Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
                     builder: (context) => const OtdLevelSelectionScreen(),
@@ -196,11 +202,11 @@ class _OneTouchGameState extends State<OneTouchGame> {
                 );
               },
             ),
-            IconButton(
-              icon: const Icon(Icons.refresh, color: Colors.black),
-              tooltip: 'Reiniciar Nivel',
-              onPressed: () => _loadLevel(currentLevelIndex),
-            ),
+            // IconButton(
+            //   icon: const Icon(Icons.refresh, color: Colors.black),
+            //   tooltip: 'Reiniciar Nivel',
+            //   onPressed: () => _loadLevel(currentLevelIndex),
+            // ),
           ],
         ),
         body: LayoutBuilder(

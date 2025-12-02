@@ -152,7 +152,7 @@ class _SlidePuzzleScreenState extends State<SlidePuzzleScreen> {
           leading: IconButton(
             icon: const Icon(Icons.arrow_back, color: Colors.black),
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.pushReplacementNamed(context, '/home');
             },
           ),
           actions: [

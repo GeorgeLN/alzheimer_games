@@ -80,7 +80,7 @@ class MyApp extends StatelessWidget {
             ),
             child: const TriviaScreen(),
           ),
-          '/encaje_figura': (context) => const FiguraEncajeScreen(),
+          '/encaje_figura': (context) => const FitPatternScreen(),
           '/otd': (context) => const OneTouchGame(),
         },
         onGenerateRoute: (settings) {

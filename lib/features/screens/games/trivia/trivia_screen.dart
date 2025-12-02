@@ -132,7 +132,9 @@ class _TriviaScreenState extends State<TriviaScreen> {
           centerTitle: true,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back, color: Colors.black),
-            onPressed: () => Navigator.pop(context),
+            onPressed: () {
+              Navigator.pushReplacementNamed(context, '/home');
+            },
           ),
         ),
         body: _buildBody(viewModel),

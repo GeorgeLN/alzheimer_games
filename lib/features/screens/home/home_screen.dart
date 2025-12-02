@@ -162,7 +162,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: Icon(Icons.games_rounded),
                       ),
                       onTap: () {
-                        Navigator.pushNamed(context, juegos[index]['route']!);
+                        Navigator.pushReplacementNamed(context, juegos[index]['route']!);
                       },
                     ),
                   );

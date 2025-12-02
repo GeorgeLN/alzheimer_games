@@ -5,14 +5,14 @@ import 'package:get_it/get_it.dart'; // Import GetIt
 import 'package:google_fonts/google_fonts.dart';
 import './pattern_view_model.dart'; // Import ViewModel
 
-class FiguraEncajeScreen extends StatefulWidget {
-  const FiguraEncajeScreen({super.key});
+class FitPatternScreen extends StatefulWidget {
+  const FitPatternScreen({super.key});
 
   @override
-  State<FiguraEncajeScreen> createState() => _FiguraEncajeScreenState();
+  State<FitPatternScreen> createState() => _FitPatternScreenState();
 }
 
-class _FiguraEncajeScreenState extends State<FiguraEncajeScreen> {
+class _FitPatternScreenState extends State<FitPatternScreen> {
   final Map<String, IconData> todasLasFiguras = {
     'Círculo': Icons.circle,
     'Cuadrado': Icons.square,
@@ -122,7 +122,7 @@ class _FiguraEncajeScreenState extends State<FiguraEncajeScreen> {
           leading: IconButton(
             icon: const Icon(Icons.arrow_back, color: Colors.black),
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.pushReplacementNamed(context, '/home');
             },
           ),
           actions: [

@@ -112,8 +112,6 @@ class _MemoramaScreenState extends State<MemoramaScreen> with TickerProviderStat
 
   @override
   Widget build(BuildContext context) {
-    //double cardSize = MediaQuery.of(context).size.width / gridSize - 20;
-
     return PopScope(
       canPop: false,
 
@@ -134,7 +132,7 @@ class _MemoramaScreenState extends State<MemoramaScreen> with TickerProviderStat
           leading: IconButton(
             icon: const Icon(Icons.arrow_back, color: Colors.black),
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.pushReplacementNamed(context, '/home');
             },
           ),
           actions: [
